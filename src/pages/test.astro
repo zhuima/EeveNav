@@ -1,0 +1,49 @@
+---
+import PostList from '@/components/post/PostList.astro'
+import Sidebar from '@/components/Sidebar.astro'
+import Layout from '@/layouts/Layout.astro'
+import { getCollection } from 'astro:content'
+
+export async function getStaticPaths({ paginate }) {
+    const allPosts = await getCollection('blog')
+    const result = paginate(allPosts, {
+    pageSize: 2,
+    // 自定义路径生成
+    getStaticPaths: ({ pageCount }) => {
+      return [
+        { params: { page: undefined }, props: { currentPage: 1 } },
+        ...Array.from({ length: pageCount - 1 }, (_, i) => ({
+          params: { page: `page/${i + 2}` },
+          props: { currentPage: i + 2 },
+        })),
+      ]
+    },
+  })
+  return result
+}
+
+const { page } = Astro.props
+
+
+const tags = [
+  {
+    name: '最新',
+    slug: '',
+  },
+];
+
+
+---
+
+<Layout>
+    <div class="">
+        <div class="flex py-6">
+            {tags.map(tag => <a href={`/tags/${tag.slug}`}>{tag.name}</a>)}
+          </div>
+      <div class="flex gap-x-4">
+        <PostList page={page} />
+        <Sidebar />
+      </div>
+    </div>
+
+  </Layout>

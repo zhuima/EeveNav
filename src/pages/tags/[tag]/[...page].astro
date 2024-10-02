@@ -1,0 +1,38 @@
+---
+import PostList from '@/components/post/PostList.astro'
+import Sidebar from '@/components/Sidebar.astro'
+import Layout from '@/layouts/Layout.astro'
+import { getCollection } from 'astro:content'
+
+export async function getStaticPaths({ paginate }) {
+  const allPosts = await getCollection('blog')
+  // 获取所有的tag
+  const tags = allPosts.flatMap(post => post.data.tags)
+
+  return tags.flatMap((tag) => {
+    const filteredPosts = allPosts.filter(
+      post => post.data.tags.includes(tag),
+    )
+    const result = paginate(filteredPosts, {
+      pageSize: 20,
+      params: { tag },
+      // 自定义路由格式
+      getPageNumbers: ({ totalPages }) =>
+        Array.from({ length: totalPages }, (_, i) => i + 1),
+    })
+    return result
+  })
+}
+
+const { page } = Astro.props
+---
+
+<Layout title="Categories">
+  <div class="">
+    <div class="flex gap-x-4">
+      <PostList page={page} />
+      <Sidebar />
+    </div>
+  </div>
+
+</Layout>

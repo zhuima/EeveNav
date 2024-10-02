@@ -1,0 +1,15 @@
+---
+import MaxPaginate from '@/components/Max/MaxPaginate.astro'
+import PostItem from './PostItem.astro'
+
+const { page } = Astro.props
+const posts = page.data;
+---
+
+<div class="flex flex-col flex-1">
+  <div class="grid grid-cols-3 gap-y-10 mx-auto gap-x-8 mb-8">
+    {(posts ?? []).map(post => <PostItem post={post} />)}
+  </div>
+
+  <MaxPaginate class="mt-20" page={page} />
+</div>

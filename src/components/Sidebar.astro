@@ -1,0 +1,61 @@
+
+---
+import MaxInput from '@/components/Max/MaxInput.astro'
+import { getCategories, getTags } from '@/utils'
+
+const categories = await getCategories()
+const tags = await getTags()
+
+---
+<aside class="w-[260px] flex flex-col flex-shrink-0">
+    <div>
+        <MaxInput placeholder="请输入内容" />
+    </div>
+
+    <div class="my-4">
+        <h3 class="font-bold title relative pl-4">分类</h3>
+        <ul>
+            {
+                categories.map(category => (
+                    <li class="py-4">
+                        <a href={`/categories/${category.name}`}>{category.name}
+                        <span class="ml-1">({category.count})</span>
+                        </a>
+                    </li>
+                ))
+            }
+        </ul>
+    </div>
+
+    <div class="my-4">
+        <h3 class="font-bold title relative pl-4">标签</h3>
+        <ul class="flex flex-wrap gap-4 mt-4">
+            {
+                tags.map(tag => (
+                    <li class="px-1 py-2 text-xs border rounded-lg block leading-6 hover:border-ring">
+                        <a href={`/tags/${tag}`}>{tag}
+                        </a>
+                    </li>
+                ))
+            }
+        </ul>
+    </div>
+</aside>
+
+<style>
+
+    .title:before {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 4px;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    background: #1a1818;
+
+    background: linear-gradient(to bottom, #dc2626 35%, #dc2626 100%) left center no-repeat;
+    background-size: 100%;
+}
+</style>

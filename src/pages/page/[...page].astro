@@ -1,0 +1,32 @@
+---
+import PostList from '@/components/post/PostList.astro'
+import Sidebar from '@/components/Sidebar.astro'
+import Layout from '@/layouts/Layout.astro'
+import PostLayout from '@/layouts/PostLayout.astro'
+import { getCollection } from 'astro:content'
+import { record } from 'astro:schema'
+
+export async function getStaticPaths({ paginate }) {
+    const allPosts = await getCollection('blog')
+    const result = paginate(allPosts, {
+      pageSize: 20,
+      // 自定义路由格式
+      getPageNumbers: ({ totalPages }) =>
+        Array.from({ length: totalPages }, (_, i) => i + 1),
+    })
+    return result
+}
+
+const { page } = Astro.props
+
+---
+
+<Layout>
+    <div class="">
+        <PostLayout>
+            <PostList page={page} />
+          </PostLayout>
+      </div>
+    </div>
+
+  </Layout>
