@@ -1,7 +1,7 @@
 ---
 import PostList from '@/components/post/PostList.astro'
-import Sidebar from '@/components/Sidebar.astro'
 import Layout from '@/layouts/Layout.astro'
+import PostLayout from '@/layouts/PostLayout.astro'
 import { getCollection } from 'astro:content'
 
 export async function getStaticPaths({ paginate }) {
@@ -29,10 +29,9 @@ const { page } = Astro.props
 
 <Layout title="Categories">
   <div class="">
-    <div class="flex gap-x-4">
-      <PostList page={page} />
-      <Sidebar />
-    </div>
+    <PostLayout>
+        <PostList page={page} />
+      </PostLayout>
   </div>
 
 </Layout>

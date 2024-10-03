@@ -5,8 +5,8 @@ import { Image } from 'astro:assets'
 const { post } = Astro.props
 ---
 
-<div class="h-75">
-  <article class="rounded-lg shadow-sm h-full">
+<div class="">
+  <article class="rounded-lg shadow-lg h-full">
     <div class="cursor-pointer w-full h-40">
       <a href={`/posts/${post.slug}`} target="_blank">
         <Image
@@ -25,13 +25,13 @@ const { post } = Astro.props
 
     <div class="p-4">
       <div class="flex flex-col space-y-1.5 h-15">
-        <h3 class="text-lg font-semibold leading-none tracking-tight h-9">
+        <h3 class="text-lg font-semibold tracking-tight h-9">
           {post.data.title}
         </h3>
         <h5 class="text-sm text-muted-foreground text-right">by ibucoin</h5>
       </div>
 
-      <section class="text-sm font-medium leading-none mt-6">
+      <section class="text-sm font-medium mt-2 h-10">
         {post.data.des}
       </section>
       <div class="mt-4 flex items-center justify-between">
