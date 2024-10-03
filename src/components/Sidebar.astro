@@ -3,6 +3,7 @@
 import MaxInput from '@/components/Max/MaxInput.astro'
 import { getCategories, getTags } from '@/utils'
 
+
 const categories = await getCategories()
 const tags = await getTags()
 
@@ -18,8 +19,8 @@ const tags = await getTags()
             {
                 categories.map(category => (
                     <li class="py-4">
-                        <a href={`/categories/${category.name}`}>{category.name}
-                        <span class="ml-1">({category.count})</span>
+                        <a href={`/categories/${category?.name}`}>{category?.name}
+                        <span class="ml-1">({category?.count})</span>
                         </a>
                     </li>
                 ))

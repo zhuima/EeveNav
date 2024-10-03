@@ -8,18 +8,23 @@ export async function getPosts(tag = '') {
   return posts
 }
 
+interface Category {
+  name: string
+  count: number
+}
+
 export async function getCategories() {
   const posts = await getCollection('blog')
 
   // 获取分类,返回分类名称和数量,即name和count
   const categories = posts.reduce((acc, post) => {
-    const category = post.data.category
+    const category = post.data.category as string
     if (!acc[category]) {
-      acc[category] = { name: category, count: 0 }
+      acc[category] = { name: category, count: 0 } as Category
     }
     acc[category].count++
     return acc
-  }, {})
+  }, {} as Record<string, Category>)
 
   return Object.values(categories)
 }

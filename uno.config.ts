@@ -1,5 +1,4 @@
 import { defineConfig, presetAttributify, presetUno } from 'unocss'
-import style from './src/assets/sytle.css'
 
 export default defineConfig({
   presets: [
