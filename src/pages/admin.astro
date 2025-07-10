@@ -370,11 +370,19 @@ await ensureDatabaseData()
 // 加载统计信息
 async function loadStats() {
   try {
+    console.log('开始加载统计信息...')
+    
     const [postsRes, categoriesRes, tagsRes] = await Promise.all([
       fetch('/api/blog?action=posts'),
       fetch('/api/blog?action=categories'),
       fetch('/api/blog?action=tags'),
     ])
+
+    console.log('API响应状态:', {
+      posts: postsRes.status,
+      categories: categoriesRes.status,
+      tags: tagsRes.status
+    })
 
     // 检查响应状态
     if (!postsRes.ok) {
@@ -391,28 +399,55 @@ async function loadStats() {
     const categories = await categoriesRes.json()
     const tags = await tagsRes.json()
 
+    console.log('原始数据:', { posts, categories, tags })
+
     // 确保返回的是数组
     const postsArray = Array.isArray(posts) ? posts : []
     const categoriesArray = Array.isArray(categories) ? categories : []
     const tagsArray = Array.isArray(tags) ? tags : []
 
-    document.getElementById('posts-count')!.textContent = postsArray.length.toString()
-    document.getElementById('categories-count')!.textContent = categoriesArray.length.toString()
-    document.getElementById('tags-count')!.textContent = tagsArray.length.toString()
+    console.log('处理后的数组:', {
+      postsCount: postsArray.length,
+      categoriesCount: categoriesArray.length,
+      tagsCount: tagsArray.length
+    })
+
+    // 更新DOM元素
+    const postsCountEl = document.getElementById('posts-count')
+    const categoriesCountEl = document.getElementById('categories-count')
+    const tagsCountEl = document.getElementById('tags-count')
+
+    if (postsCountEl) {
+      postsCountEl.textContent = postsArray.length.toString()
+      console.log('更新文章数量:', postsArray.length)
+    }
+    if (categoriesCountEl) {
+      categoriesCountEl.textContent = categoriesArray.length.toString()
+      console.log('更新分类数量:', categoriesArray.length)
+    }
+    if (tagsCountEl) {
+      tagsCountEl.textContent = tagsArray.length.toString()
+      console.log('更新标签数量:', tagsArray.length)
+    }
 
     loadPosts(postsArray)
-    loadCategories(categoriesArray)
     loadCategoriesOverview(categoriesArray)
   } catch (error) {
     console.error('加载统计信息失败:', error)
     // 显示错误信息
-    document.getElementById('posts-count')!.textContent = '0'
-    document.getElementById('categories-count')!.textContent = '0'
-    document.getElementById('tags-count')!.textContent = '0'
+    const postsCountEl = document.getElementById('posts-count')
+    const categoriesCountEl = document.getElementById('categories-count') 
+    const tagsCountEl = document.getElementById('tags-count')
+    
+    if (postsCountEl) postsCountEl.textContent = 'ERR'
+    if (categoriesCountEl) categoriesCountEl.textContent = 'ERR'
+    if (tagsCountEl) tagsCountEl.textContent = 'ERR'
     
     // 清空表格
-    const tbody = document.getElementById('posts-table')!
-    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">加载失败，请刷新页面重试</td></tr>'
+    const tbody = document.getElementById('posts-table')
+    if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500">加载失败，请刷新页面重试<br>错误: ' + error.message + '</td></tr>'
+    }
   }
 }
 
@@ -484,34 +519,6 @@ function loadCategoriesOverview(categories) {
       </div>
       <span class="text-xs text-gray-500">${category.count} 篇</span>
     </div>
-  `).join('')
-}
-function loadCategories(categories: any[]) {
-  const tbody = document.getElementById('categories-table')!
-  
-  if (!Array.isArray(categories) || categories.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-500">暂无分类</td></tr>'
-    return
-  }
-  
-  tbody.innerHTML = categories.map((category: any) => `
-    <tr>
-      <td class="px-6 py-4 whitespace-nowrap">
-        <div class="text-sm font-medium text-gray-900">${category.name || '未知分类'}</div>
-      </td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-        ${category.count || 0} 篇文章
-      </td>
-      <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-        <button 
-          onclick="window.deleteCategory('${category.name}')"
-          class="text-red-600 hover:text-red-900"
-          ${category.count > 0 ? 'disabled title="有文章使用此分类，无法删除"' : ''}
-        >
-          删除
-        </button>
-      </td>
-    </tr>
   `).join('')
 }
 
@@ -752,37 +759,6 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('复制失败，请重试')
     }
   }
-
-  // 删除分类函数
-  window.deleteCategory = async (categoryName: string) => {
-    if (!confirm(`确定要删除分类 "${categoryName}" 吗？`)) {
-      return
-    }
-
-    try {
-      const response = await fetch('/api/blog', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'delete-category',
-          data: { categoryName },
-        }),
-      })
-
-      if (response.ok) {
-        loadStats() // 重新加载数据
-        alert('分类删除成功！')
-      } else {
-        const error = await response.json()
-        alert(`删除失败: ${error.error}`)
-      }
-    } catch (error) {
-      console.error('删除失败:', error)
-      alert('删除失败，请重试')
-    }
-  }
 })
 
 // 声明全局函数
@@ -791,7 +767,6 @@ declare global {
     editPost: (id: number) => void
     deletePost: (id: number) => void
     copyPost: (id: number) => void
-    deleteCategory: (categoryName: string) => void
   }
 }
 </script>
