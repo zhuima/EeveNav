@@ -1,0 +1,201 @@
+---
+import Layout from '../layouts/Layout.astro'
+
+// 检查是否已经登录
+const cookies = Astro.cookies
+const isAuthenticated = cookies.get('admin_auth')?.value === 'authenticated'
+
+// 如果已经登录，重定向到管理页面
+if (isAuthenticated) {
+  return Astro.redirect('/admin')
+}
+
+// 处理登录表单提交
+if (Astro.request.method === 'POST') {
+  const formData = await Astro.request.formData()
+  const username = formData.get('username') as string
+  const password = formData.get('password') as string
+  
+  // 简单的用户验证（生产环境中应该使用更安全的方式）
+  const ADMIN_USERNAME = import.meta.env.ADMIN_USERNAME || 'admin'
+  const ADMIN_PASSWORD = import.meta.env.ADMIN_PASSWORD || 'admin123'
+  
+  if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+    // 设置认证cookie，24小时过期
+    cookies.set('admin_auth', 'authenticated', {
+      path: '/',
+      maxAge: 60 * 60 * 24, // 24小时
+      httpOnly: true,
+      secure: import.meta.env.PROD, // 生产环境使用HTTPS
+      sameSite: 'strict'
+    })
+    
+    return Astro.redirect('/admin')
+  } else {
+    // 登录失败，显示错误
+    var loginError = true
+  }
+}
+---
+
+<Layout title="管理员登录 - EeveNav">
+  <main class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+    <div class="w-full max-w-md mx-auto px-4">
+      <!-- 登录卡片 -->
+      <div class="bg-white rounded-xl shadow-xl p-8">
+        <!-- Logo和标题 -->
+        <div class="text-center mb-8">
+          <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+          </div>
+          <h1 class="text-2xl font-bold text-gray-900 mb-2">管理员登录</h1>
+          <p class="text-gray-600">请输入您的凭据以访问管理面板</p>
+        </div>
+
+        <!-- 错误提示 -->
+        {loginError && (
+          <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span class="text-red-800 text-sm">用户名或密码错误，请重试</span>
+            </div>
+          </div>
+        )}
+
+        <!-- 登录表单 -->
+        <form method="POST" class="space-y-6">
+          <div>
+            <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+              用户名
+            </label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              required
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+              placeholder="请输入用户名"
+            />
+          </div>
+
+          <div>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+              密码
+            </label>
+            <div class="relative">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors pr-12"
+                placeholder="请输入密码"
+              />
+              <button
+                type="button"
+                id="toggle-password"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                <svg id="eye-open" class="w-5 h-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+                <svg id="eye-closed" class="w-5 h-5 text-gray-400 hover:text-gray-600 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-[1.02]"
+          >
+            登录
+          </button>
+        </form>
+
+        <!-- 安全提示 -->
+        <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+          <div class="flex items-start">
+            <svg class="w-5 h-5 text-gray-400 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <div class="text-xs text-gray-600">
+              <p class="font-medium mb-1">安全提示：</p>
+              <ul class="space-y-1">
+                <li>• 请确保您是在安全的网络环境中登录</li>
+                <li>• 登录会话将在24小时后自动过期</li>
+                <li>• 如果忘记密码，请联系系统管理员</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- 返回首页链接 -->
+        <div class="mt-6 text-center">
+          <a href="/" class="text-sm text-gray-500 hover:text-gray-700 transition-colors">
+            ← 返回首页
+          </a>
+        </div>
+      </div>
+
+      <!-- 默认凭据提示（仅开发环境） -->
+      {!import.meta.env.PROD && (
+        <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div class="flex items-center">
+            <svg class="w-5 h-5 text-yellow-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"></path>
+            </svg>
+            <div class="text-sm text-yellow-800">
+              <p class="font-medium">开发环境默认凭据：</p>
+              <p>用户名: admin | 密码: admin123</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  </main>
+</Layout>
+
+<script>
+  // 密码显示/隐藏切换
+  const togglePassword = document.getElementById('toggle-password')
+  const passwordInput = document.getElementById('password') as HTMLInputElement
+  const eyeOpen = document.getElementById('eye-open')
+  const eyeClosed = document.getElementById('eye-closed')
+
+  if (togglePassword && passwordInput && eyeOpen && eyeClosed) {
+    togglePassword.addEventListener('click', () => {
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text'
+        eyeOpen.classList.add('hidden')
+        eyeClosed.classList.remove('hidden')
+      } else {
+        passwordInput.type = 'password'
+        eyeOpen.classList.remove('hidden')
+        eyeClosed.classList.add('hidden')
+      }
+    })
+  }
+
+  // 表单验证
+  const form = document.querySelector('form')
+  if (form) {
+    form.addEventListener('submit', (e) => {
+      const username = (document.getElementById('username') as HTMLInputElement).value.trim()
+      const password = (document.getElementById('password') as HTMLInputElement).value.trim()
+      
+      if (!username || !password) {
+        e.preventDefault()
+        alert('请输入用户名和密码')
+        return
+      }
+    })
+  }
+</script>
+</Layout>

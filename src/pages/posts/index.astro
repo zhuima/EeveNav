@@ -1,0 +1,56 @@
+---
+import PostList from '@/components/post/PostList.astro'
+import Layout from '@/layouts/Layout.astro'
+import PostLayout from '@/layouts/PostLayout.astro'
+import { getDatabase } from '../../lib/database'
+
+// 从数据库获取所有文章
+const db = getDatabase()
+const allPosts = db.getPosts()
+
+// 转换数据库文章格式为与内容集合兼容的格式
+const formattedPosts = allPosts.map(post => ({
+  slug: post.slug,
+  data: {
+    title: post.title,
+    date: post.date,
+    des: post.des,
+    cover: post.cover,
+    category: post.category,
+    tags: post.tags,
+    external_url: post.external_url,
+  }
+}))
+
+// 按日期排序
+const sortedPosts = formattedPosts.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+)
+
+// 分页
+const postsPerPage = 20
+const lastPage = Math.ceil(sortedPosts.length / postsPerPage)
+
+const page = {
+  data: sortedPosts,
+  currentPage: 1,
+  lastPage,
+  url: {
+    current: `/posts`,
+    next: null,
+    prev: null,
+    first: null,
+    last: null,
+  },
+}
+
+---
+
+<Layout>
+  <div class="container mx-auto px-4">
+    <h1 class="text-3xl font-bold my-8">所有文章</h1>
+    <PostLayout>
+      <PostList page={page} />
+    </PostLayout>
+  </div>
+</Layout>

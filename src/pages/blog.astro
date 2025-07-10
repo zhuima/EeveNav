@@ -1,0 +1,90 @@
+---
+import PostList from '@/components/post/PostList.astro'
+import Layout from '@/layouts/Layout.astro'
+import PostLayout from '@/layouts/PostLayout.astro'
+import { getDatabase } from '../lib/database'
+import { ensureDatabaseData } from '../lib/migration'
+
+// 确保数据库有数据
+await ensureDatabaseData()
+
+const tags = [
+  {
+    name: '最新',
+    slug: '',
+  },
+  {
+    name: '设计资源',
+    slug: '设计资源',
+  },
+]
+
+// 从数据库获取文章，而不是从内容集合
+const db = getDatabase()
+const allPosts = db.getPosts()
+
+// 转换数据库文章格式为与内容集合兼容的格式
+const formattedPosts = allPosts.map(post => ({
+  slug: post.slug,
+  data: {
+    title: post.title,
+    date: post.date,
+    des: post.des,
+    cover: post.cover,
+    category: post.category,
+    tags: post.tags,
+  }
+}))
+
+// 按日期排序
+const sortedPosts = formattedPosts.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+)
+
+// 获取最新的20个post
+const latestPosts = sortedPosts.slice(0, 20)
+const lastPage = Math.ceil(sortedPosts.length / 20)
+
+const page = {
+  data: latestPosts,
+  currentPage: 1,
+  lastPage,
+  url: {
+    cuurent: `/blog/page/1`,
+    next: null,
+    prev: null,
+    first: null,
+    last: null,
+  },
+}
+if (lastPage > 1) {
+   page.url.next = `/blog/page/2`
+   page.url.last = `/blog/page/${lastPage}`
+}
+---
+
+<Layout title="博客文章 - EeveNav">
+  <div class="w-full px-4 sm:px-6 lg:px-8">
+    <div class="py-6 sm:py-8">
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">博客文章</h1>
+      
+      <div class="flex flex-wrap pt-4 sm:pt-6 w-full gap-2 sm:gap-4 mb-6 sm:mb-8">
+        {tags.map(tag => (
+          <a href={`/tags/${tag.slug}`} class="block">
+            <span class={`inline-block px-3 py-1 sm:px-4 sm:py-2 text-sm sm:text-base rounded-full transition-colors ${
+              tag.slug === '' 
+                ? 'bg-blue-500 text-white' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}>
+              {tag.name}
+            </span>
+          </a>
+        ))}
+      </div>
+      
+      <PostLayout>
+        <PostList page={page} />
+      </PostLayout>
+    </div>
+  </div>
+</Layout>

@@ -2,43 +2,69 @@
 import PostList from '@/components/post/PostList.astro'
 import Layout from '@/layouts/Layout.astro'
 import PostLayout from '@/layouts/PostLayout.astro'
-import { getCollection } from 'astro:content'
+import { getDatabase } from '../../../lib/database'
 
-export async function getStaticPaths({ paginate }) {
-  const allPosts = await getCollection('blog')
-  // 获取所有唯一的分类
-  const uniqueCategories = [
-    ...new Set(allPosts.map(post => post.data.category)),
-  ]
+// 获取URL参数
+const { category } = Astro.params;
+const pageParam = Astro.params.page || '1';
+const currentPage = parseInt(pageParam.split('/').pop() || '1');
 
-  // 为每个分类生成一个页面
-  return uniqueCategories.flatMap((category) => {
-    const filteredPosts = allPosts.filter(
-      post => post.data.category === category,
-    )
-    const result = paginate(filteredPosts, {
-      params: { category },
-      pageSize: 20,
-      props: { category },
-      // 自定义路由格式
-      getPageNumbers: ({ totalPages }) =>
-        Array.from({ length: totalPages }, (_, i) => i + 1),
-    })
-    return result
-  })
-}
+// 获取数据库实例
+const db = getDatabase();
 
-const { page } = Astro.props
+// 获取该分类下的所有文章
+const posts = db.getPostsByCategory(category || '');
 
+// 转换为与内容集合兼容的格式
+const formattedPosts = posts.map(post => ({
+  slug: post.slug,
+  data: {
+    title: post.title,
+    date: post.date,
+    des: post.des,
+    cover: post.cover,
+    category: post.category,
+    tags: post.tags,
+  }
+}));
 
+// 按日期排序
+const sortedPosts = formattedPosts.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
 
+// 手动分页
+const postsPerPage = 20;
+const totalPosts = sortedPosts.length;
+const totalPages = Math.ceil(totalPosts / postsPerPage);
+const start = (currentPage - 1) * postsPerPage;
+const end = start + postsPerPage;
+const paginatedPosts = sortedPosts.slice(start, end);
+
+// 创建分页对象
+const page = {
+  data: paginatedPosts,
+  start,
+  end: Math.min(end, totalPosts),
+  size: postsPerPage,
+  total: totalPosts,
+  currentPage,
+  lastPage: totalPages,
+  url: {
+    current: `/categories/${category}/${currentPage}`,
+    prev: currentPage > 1 ? `/categories/${category}/${currentPage - 1}` : null,
+    next: currentPage < totalPages ? `/categories/${category}/${currentPage + 1}` : null,
+    first: `/categories/${category}/1`,
+    last: `/categories/${category}/${totalPages}`,
+  },
+};
 ---
 
-<Layout title="Categories">
+<Layout title={`分类: ${category}`}>
   <div class="">
+    <h1 class="text-3xl font-bold my-8 text-center">分类: {category}</h1>
     <PostLayout>
         <PostList page={page} />
       </PostLayout>
   </div>
-
 </Layout>

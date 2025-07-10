@@ -1,0 +1,513 @@
+---
+import Layout from '../layouts/Layout.astro'
+import { ensureDatabaseData } from '../lib/migration'
+
+// 检查用户是否已登录
+const cookies = Astro.cookies
+const isAuthenticated = cookies.get('admin_auth')?.value === 'authenticated'
+
+// 如果未登录，重定向到登录页面
+if (!isAuthenticated) {
+  return Astro.redirect('/login')
+}
+
+// 处理登出请求
+if (Astro.url.searchParams.get('logout') === 'true') {
+  cookies.delete('admin_auth', { path: '/' })
+  return Astro.redirect('/login')
+}
+
+// 确保数据库有数据
+await ensureDatabaseData()
+---
+
+<Layout title="博客管理">
+  <div class="container mx-auto px-4 py-8">
+    <!-- 顶部导航栏 -->
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-3xl font-bold">博客管理</h1>
+      <div class="flex items-center space-x-4">
+        <span class="text-sm text-gray-600">欢迎回来，管理员</span>
+        <a 
+          href="/admin?logout=true" 
+          class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+        >
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+          </svg>
+          退出登录
+        </a>
+      </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-2">文章总数</h2>
+        <p class="text-3xl font-bold text-blue-600" id="posts-count">-</p>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-2">分类数量</h2>
+        <p class="text-3xl font-bold text-green-600" id="categories-count">-</p>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-xl font-semibold mb-2">标签数量</h2>
+        <p class="text-3xl font-bold text-purple-600" id="tags-count">-</p>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow">
+      <div class="p-6 border-b">
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-semibold">文章列表</h2>
+          <button 
+            id="add-post-btn"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            添加文章
+          </button>
+        </div>
+      </div>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">标题</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">分类</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">标签</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">发布时间</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+            </tr>
+          </thead>
+          <tbody id="posts-table" class="bg-white divide-y divide-gray-200">
+            <!-- 动态内容 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 添加/编辑文章模态框 -->
+  <div id="post-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+      <div class="p-6 border-b flex justify-between items-center">
+        <h3 class="text-lg font-semibold" id="modal-title">添加文章</h3>
+        <button type="button" id="close-modal-btn" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+      </div>
+      
+      <form id="post-form" class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">标题 *</label>
+            <input 
+              type="text" 
+              name="title" 
+              required 
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Slug *</label>
+            <input 
+              type="text" 
+              name="slug" 
+              required 
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">分类 *</label>
+            <input 
+              type="text" 
+              name="category" 
+              required 
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">发布时间 *</label>
+            <input 
+              type="datetime-local" 
+              name="date" 
+              required 
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">封面图片URL *</label>
+            <input 
+              type="url" 
+              name="cover" 
+              required 
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">外部链接URL</label>
+            <input 
+              type="url" 
+              name="external_url" 
+              placeholder="https://example.com"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">描述 *</label>
+            <textarea 
+              name="des" 
+              required 
+              rows="3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            ></textarea>
+          </div>
+          
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">标签 (用逗号分隔)</label>
+            <input 
+              type="text" 
+              name="tags" 
+              placeholder="标签1, 标签2, 标签3"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">内容 *</label>
+            <textarea 
+              name="content" 
+              required 
+              rows="10"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            ></textarea>
+          </div>
+        </div>
+        
+        <div class="flex justify-end space-x-3 mt-6">
+          <button 
+            type="button" 
+            id="cancel-btn"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
+          >
+            取消
+          </button>
+          <button 
+            type="submit"
+            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md"
+          >
+            保存
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</Layout>
+
+<script>
+// 加载统计信息
+async function loadStats() {
+  try {
+    const [postsRes, categoriesRes, tagsRes] = await Promise.all([
+      fetch('/api/blog?action=posts'),
+      fetch('/api/blog?action=categories'),
+      fetch('/api/blog?action=tags'),
+    ])
+
+    // 检查响应状态
+    if (!postsRes.ok) {
+      throw new Error(`Posts API failed: ${postsRes.status}`)
+    }
+    if (!categoriesRes.ok) {
+      throw new Error(`Categories API failed: ${categoriesRes.status}`)
+    }
+    if (!tagsRes.ok) {
+      throw new Error(`Tags API failed: ${tagsRes.status}`)
+    }
+
+    const posts = await postsRes.json()
+    const categories = await categoriesRes.json()
+    const tags = await tagsRes.json()
+
+    // 确保返回的是数组
+    const postsArray = Array.isArray(posts) ? posts : []
+    const categoriesArray = Array.isArray(categories) ? categories : []
+    const tagsArray = Array.isArray(tags) ? tags : []
+
+    document.getElementById('posts-count')!.textContent = postsArray.length.toString()
+    document.getElementById('categories-count')!.textContent = categoriesArray.length.toString()
+    document.getElementById('tags-count')!.textContent = tagsArray.length.toString()
+
+    loadPosts(postsArray)
+  } catch (error) {
+    console.error('加载统计信息失败:', error)
+    // 显示错误信息
+    document.getElementById('posts-count')!.textContent = '0'
+    document.getElementById('categories-count')!.textContent = '0'
+    document.getElementById('tags-count')!.textContent = '0'
+    
+    // 清空表格
+    const tbody = document.getElementById('posts-table')!
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">加载失败，请刷新页面重试</td></tr>'
+  }
+}
+
+// 加载文章列表
+function loadPosts(posts: any[]) {
+  const tbody = document.getElementById('posts-table')!
+  
+  if (!Array.isArray(posts) || posts.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">暂无文章</td></tr>'
+    return
+  }
+  
+  tbody.innerHTML = posts.map((post: any) => `
+    <tr>
+      <td class="px-6 py-4 whitespace-nowrap">
+        <div class="text-sm font-medium text-gray-900">${post.title || '无标题'}</div>
+        <div class="text-sm text-gray-500">${post.slug || '无slug'}</div>
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap">
+        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+          ${post.category || '未分类'}
+        </span>
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        ${Array.isArray(post.tags) ? post.tags.join(', ') : '无标签'}
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        ${post.date ? new Date(post.date).toLocaleDateString() : '未知日期'}
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <button 
+          onclick="window.editPost(${post.id})"
+          class="text-indigo-600 hover:text-indigo-900 mr-3"
+        >
+          编辑
+        </button>
+        <button 
+          onclick="window.deletePost(${post.id})"
+          class="text-red-600 hover:text-red-900"
+        >
+          删除
+        </button>
+      </td>
+    </tr>
+  `).join('')
+}
+
+// 页面加载时初始化
+document.addEventListener('DOMContentLoaded', () => {
+  // 先加载统计信息
+  loadStats()
+  
+  // 绑定模态框事件
+  const modal = document.getElementById('post-modal')!
+  const form = document.getElementById('post-form')! as HTMLFormElement
+  const addBtn = document.getElementById('add-post-btn')!
+  const cancelBtn = document.getElementById('cancel-btn')!
+  const closeModalBtn = document.getElementById('close-modal-btn')!
+
+  // 关闭模态框函数
+  function closeModal() {
+    modal.classList.add('hidden')
+    modal.classList.remove('flex')
+    console.log('Modal closed') // 调试用
+  }
+
+  // 打开模态框函数
+  function openModal() {
+    modal.classList.remove('hidden')
+    modal.classList.add('flex')
+    console.log('Modal opened') // 调试用
+  }
+
+  addBtn.addEventListener('click', () => {
+    console.log('Add button clicked') // 调试用
+    document.getElementById('modal-title')!.textContent = '添加文章'
+    form.reset()
+    form.dataset.mode = 'add'
+    form.dataset.id = ''
+    openModal()
+  })
+
+  // 多种关闭方式
+  cancelBtn.addEventListener('click', (e) => {
+    e.preventDefault()
+    console.log('Cancel button clicked') // 调试用
+    closeModal()
+  })
+
+  closeModalBtn.addEventListener('click', (e) => {
+    e.preventDefault()
+    console.log('Close X button clicked') // 调试用
+    closeModal()
+  })
+
+  // 点击背景关闭
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      console.log('Background clicked') // 调试用
+      closeModal()
+    }
+  })
+
+  // 确保模态框内部点击不会关闭模态框
+  document.querySelector('#post-modal > div')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+
+  // ESC键关闭
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+      console.log('ESC key pressed') // 调试用
+      closeModal()
+    }
+  })
+
+  // 表单提交
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    e.stopPropagation() // 阻止事件冒泡
+    
+    const formData = new FormData(form)
+    const tagsValue = formData.get('tags') as string
+    const dateValue = formData.get('date') as string
+    const externalUrl = formData.get('external_url') as string
+    
+    const data = {
+      title: formData.get('title') as string,
+      slug: formData.get('slug') as string,
+      category: formData.get('category') as string,
+      date: new Date(dateValue),
+      cover: formData.get('cover') as string,
+      des: formData.get('des') as string,
+      tags: tagsValue ? tagsValue.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag) : [],
+      content: formData.get('content') as string,
+      external_url: externalUrl || undefined,
+    }
+
+    try {
+      const isEdit = form.dataset.mode === 'edit'
+      const url = '/api/blog'
+      const method = 'POST'
+      const body = {
+        action: isEdit ? 'update' : 'add',
+        data: isEdit ? { ...data, id: Number.parseInt(form.dataset.id || '0') } : data,
+      }
+
+      console.log('提交数据:', body) // 调试用
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        console.log('提交成功:', result) // 调试用
+        
+        // 提交成功后再关闭模态框
+        closeModal()
+        loadStats() // 重新加载数据
+        alert(isEdit ? '文章更新成功！' : '文章添加成功！')
+      } else {
+        const error = await response.json()
+        console.error('API错误:', error) // 调试用
+        alert(`操作失败: ${error.error}${error.details ? '\n' + error.details : ''}`)
+      }
+    } catch (error) {
+      console.error('提交失败:', error)
+      alert('操作失败，请重试')
+    }
+  })
+
+  // 编辑函数（需要访问closeModal和openModal）
+  window.editPost = async (id: number) => {
+    try {
+      const response = await fetch(`/api/blog?action=posts`)
+      const posts = await response.json()
+      const post = posts.find((p: any) => p.id === id)
+
+      if (!post) {
+        alert('文章不存在')
+        return
+      }
+
+      document.getElementById('modal-title')!.textContent = '编辑文章'
+      form.dataset.mode = 'edit'
+      form.dataset.id = id.toString()
+
+      // 填充表单
+      ;(form.querySelector('[name="title"]') as HTMLInputElement).value = post.title
+      ;(form.querySelector('[name="slug"]') as HTMLInputElement).value = post.slug
+      ;(form.querySelector('[name="category"]') as HTMLInputElement).value = post.category
+      ;(form.querySelector('[name="date"]') as HTMLInputElement).value = new Date(post.date).toISOString().slice(0, 16)
+      ;(form.querySelector('[name="cover"]') as HTMLInputElement).value = post.cover
+      ;(form.querySelector('[name="des"]') as HTMLTextAreaElement).value = post.des
+      ;(form.querySelector('[name="tags"]') as HTMLInputElement).value = post.tags.join(', ')
+      ;(form.querySelector('[name="content"]') as HTMLTextAreaElement).value = post.content
+      ;(form.querySelector('[name="external_url"]') as HTMLInputElement).value = post.external_url || ''
+
+      openModal() // 使用统一的打开函数
+    } catch (error) {
+      console.error('加载文章失败:', error)
+      alert('加载文章失败')
+    }
+  }
+
+  // 删除函数
+  window.deletePost = async (id: number) => {
+    // 从DOM中获取文章标题
+    const titleElement = document.querySelector(`button[onclick="window.deletePost(${id})"]`)
+      ?.closest('tr')
+      ?.querySelector('.text-gray-900')
+    const title = titleElement?.textContent || '未知文章'
+    
+    if (!confirm(`确定要删除文章 "${title}" 吗？`)) {
+      return
+    }
+
+    try {
+      const response = await fetch('/api/blog', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'delete',
+          data: { id },
+        }),
+      })
+
+      if (response.ok) {
+        loadStats() // 重新加载数据
+        alert('文章删除成功！')
+      } else {
+        const error = await response.json()
+        alert(`删除失败: ${error.error}`)
+      }
+    } catch (error) {
+      console.error('删除失败:', error)
+      alert('删除失败，请重试')
+    }
+  }
+})
+
+// 声明全局函数
+declare global {
+  interface Window {
+    editPost: (id: number) => void
+    deletePost: (id: number) => void
+  }
+}
+</script>
