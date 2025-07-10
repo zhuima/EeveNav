@@ -10,10 +10,38 @@ export const GET: APIRoute = async ({ url, request }) => {
     // 使用request.url而不是url参数
     const requestUrl = new URL(request.url)
     const action = requestUrl.searchParams.get('action')
+    const searchQuery = requestUrl.searchParams.get('search')
     
     console.log('Action parameter:', action)
+    console.log('Search parameter:', searchQuery)
     
     const db = getDatabase()
+
+    // 如果有搜索参数，执行搜索
+    if (searchQuery) {
+      try {
+        const searchResults = db.searchPosts(searchQuery.trim())
+        console.log('Search results:', searchResults.length)
+        return new Response(JSON.stringify({
+          success: true,
+          posts: searchResults,
+          query: searchQuery.trim()
+        }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      } catch (searchError) {
+        console.error('Search error:', searchError)
+        return new Response(JSON.stringify({
+          success: false,
+          posts: [],
+          error: '搜索失败'
+        }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        })
+      }
+    }
 
     // 如果没有提供action参数，返回API使用信息而不是错误
     if (!action) {
@@ -25,6 +53,7 @@ export const GET: APIRoute = async ({ url, request }) => {
           tags: '获取所有标签',
           post: '获取单篇文章（需要slug参数）'
         },
+        searchUsage: 'http://localhost:4321/api/blog?search=关键词',
         usage: 'http://localhost:4321/api/blog?action=posts'
       }), {
         status: 200,

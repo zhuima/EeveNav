@@ -1,5 +1,5 @@
 ---
-import Layout from '../layouts/Layout.astro'
+import AdminLayout from '../layouts/AdminLayout.astro'
 import { ensureDatabaseData } from '../lib/migration'
 
 // 检查用户是否已登录
@@ -21,218 +21,350 @@ if (Astro.url.searchParams.get('logout') === 'true') {
 await ensureDatabaseData()
 ---
 
-<Layout title="博客管理">
-  <div class="container mx-auto px-4 py-8">
-    <!-- 顶部导航栏 -->
-    <div class="flex justify-between items-center mb-8">
-      <h1 class="text-3xl font-bold">博客管理</h1>
-      <div class="flex items-center space-x-4">
-        <span class="text-sm text-gray-600">欢迎回来，管理员</span>
-        <a 
-          href="/admin?logout=true" 
-          class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-        >
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-          </svg>
-          退出登录
-        </a>
+<AdminLayout title="仪表盘" activeSection="dashboard">
+  <!-- 欢迎卡片 -->
+  <div class="mb-8">
+    <div class="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 rounded-2xl p-8 text-white shadow-xl">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold mb-2">欢迎回来，管理员！</h1>
+          <p class="text-blue-100 text-lg">今天也要继续努力管理内容呢 🚀</p>
+        </div>
+        <div class="hidden lg:block">
+          <div class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+            <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+          </div>
+        </div>
       </div>
     </div>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-      <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-xl font-semibold mb-2">文章总数</h2>
-        <p class="text-3xl font-bold text-blue-600" id="posts-count">-</p>
-      </div>
-      
-      <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-xl font-semibold mb-2">分类数量</h2>
-        <p class="text-3xl font-bold text-green-600" id="categories-count">-</p>
-      </div>
-      
-      <div class="bg-white rounded-lg shadow p-6">
-        <h2 class="text-xl font-semibold mb-2">标签数量</h2>
-        <p class="text-3xl font-bold text-purple-600" id="tags-count">-</p>
+  </div>
+
+  <!-- 统计卡片网格 -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- 文章总数 -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-200">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 mb-1">文章总数</p>
+          <p class="text-3xl font-bold text-gray-900" id="posts-count">-</p>
+          <p class="text-xs text-green-600 mt-1">
+            <span class="font-medium">↗ 12%</span> 本月新增
+          </p>
+        </div>
+        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </div>
       </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow">
-      <div class="p-6 border-b">
-        <div class="flex justify-between items-center">
-          <h2 class="text-xl font-semibold">文章列表</h2>
-          <button 
-            id="add-post-btn"
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            添加文章
-          </button>
+    <!-- 分类数量 -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-200">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 mb-1">分类数量</p>
+          <p class="text-3xl font-bold text-gray-900" id="categories-count">-</p>
+          <p class="text-xs text-gray-500 mt-1">
+            <span class="font-medium">→ 0%</span> 无变化
+          </p>
+        </div>
+        <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
         </div>
       </div>
-      
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">标题</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">分类</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">标签</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">发布时间</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
-            </tr>
-          </thead>
-          <tbody id="posts-table" class="bg-white divide-y divide-gray-200">
-            <!-- 动态内容 -->
-          </tbody>
-        </table>
+    </div>
+
+    <!-- 标签数量 -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-200">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 mb-1">标签数量</p>
+          <p class="text-3xl font-bold text-gray-900" id="tags-count">-</p>
+          <p class="text-xs text-purple-600 mt-1">
+            <span class="font-medium">↗ 5%</span> 本月新增
+          </p>
+        </div>
+        <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
+          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+          </svg>
+        </div>
       </div>
     </div>
-    
-    <!-- 分类管理区域 -->
-    <div class="bg-white rounded-lg shadow mt-8">
-      <div class="p-6 border-b">
-        <h2 class="text-xl font-semibold">分类管理</h2>
+
+    <!-- 本月访问量 -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-200">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600 mb-1">本月访问</p>
+          <p class="text-3xl font-bold text-gray-900">2.5K</p>
+          <p class="text-xs text-blue-600 mt-1">
+            <span class="font-medium">↗ 25%</span> 较上月
+          </p>
+        </div>
+        <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
+          <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+          </svg>
+        </div>
       </div>
-      
-      <div class="p-6">
-        <div class="overflow-x-auto">
-          <table class="w-full">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">分类名称</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">文章数量</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
-              </tr>
-            </thead>
-            <tbody id="categories-table" class="bg-white divide-y divide-gray-200">
+    </div>
+  </div>
+
+  <!-- 主要功能区域 -->
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+    <!-- 文章管理 -->
+    <div class="xl:col-span-2">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
+        <div class="p-6 border-b border-gray-100">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </div>
+              <div>
+                <h2 class="text-xl font-bold text-gray-900">文章管理</h2>
+                <p class="text-sm text-gray-500">管理您的所有文章内容</p>
+              </div>
+            </div>
+            <button 
+              id="add-post-btn"
+              class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              添加文章
+            </button>
+          </div>
+        </div>
+        
+        <div class="overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">文章信息</th>
+                  <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">分类</th>
+                  <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">标签</th>
+                  <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">发布时间</th>
+                  <th class="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">操作</th>
+                </tr>
+              </thead>
+              <tbody id="posts-table" class="bg-white divide-y divide-gray-100">
+                <!-- 动态内容 -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右侧信息面板 -->
+    <div class="space-y-6">
+      <!-- 快速操作 -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
+        <div class="p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">快速操作</h3>
+          <div class="space-y-3">
+            <button class="w-full flex items-center px-4 py-3 text-left text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-colors">
+              <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              新建文章
+            </button>
+            <button class="w-full flex items-center px-4 py-3 text-left text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-colors">
+              <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+              管理分类
+            </button>
+            <button class="w-full flex items-center px-4 py-3 text-left text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-xl transition-colors">
+              <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+              </svg>
+              管理标签
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 分类管理 -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
+        <div class="p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">分类概览</h3>
+          <div class="space-y-3">
+            <div id="categories-overview" class="space-y-2">
               <!-- 动态内容 -->
-            </tbody>
-          </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 系统信息 -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
+        <div class="p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">系统信息</h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-600">系统版本</span>
+              <span class="font-medium text-gray-900">v1.0.0</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">最后更新</span>
+              <span class="font-medium text-gray-900">今天</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">数据库状态</span>
+              <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                正常
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- 添加/编辑文章模态框 -->
-  <div id="post-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
-      <div class="p-6 border-b flex justify-between items-center">
-        <h3 class="text-lg font-semibold" id="modal-title">添加文章</h3>
-        <button type="button" id="close-modal-btn" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
+  <div id="post-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden" onclick="event.stopPropagation()">
+      <div class="p-6 border-b border-gray-200 flex justify-between items-center bg-gradient-to-r from-blue-50 to-purple-50">
+        <h3 class="text-xl font-bold text-gray-900" id="modal-title">添加文章</h3>
+        <button type="button" id="close-modal-btn" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-lg transition-colors">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
       </div>
       
-      <form id="post-form" class="p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">标题 *</label>
-            <input 
-              type="text" 
-              name="title" 
-              required 
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+      <div class="overflow-y-auto max-h-[calc(90vh-80px)]">
+        <form id="post-form" class="p-6">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-semibold text-gray-900 mb-2">标题 *</label>
+              <input 
+                type="text" 
+                name="title" 
+                required 
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="请输入文章标题"
+              />
+            </div>
+            
+            <div>
+              <label class="block text-sm font-semibold text-gray-900 mb-2">Slug *</label>
+              <input 
+                type="text" 
+                name="slug" 
+                required 
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="url-friendly-slug"
+              />
+            </div>
+            
+            <div>
+              <label class="block text-sm font-semibold text-gray-900 mb-2">分类 *</label>
+              <input 
+                type="text" 
+                name="category" 
+                required 
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="文章分类"
+              />
+            </div>
+            
+            <div>
+              <label class="block text-sm font-semibold text-gray-900 mb-2">发布时间 *</label>
+              <input 
+                type="datetime-local" 
+                name="date" 
+                required 
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+            </div>
+            
+            <div class="lg:col-span-2">
+              <label class="block text-sm font-semibold text-gray-900 mb-2">封面图片URL *</label>
+              <input 
+                type="url" 
+                name="cover" 
+                required 
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="https://example.com/image.jpg"
+              />
+            </div>
+            
+            <div class="lg:col-span-2">
+              <label class="block text-sm font-semibold text-gray-900 mb-2">外部链接URL</label>
+              <input 
+                type="url" 
+                name="external_url" 
+                placeholder="https://example.com（可选）"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+            </div>
+            
+            <div class="lg:col-span-2">
+              <label class="block text-sm font-semibold text-gray-900 mb-2">描述 *</label>
+              <textarea 
+                name="des" 
+                required 
+                rows="3"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                placeholder="请输入文章描述"
+              ></textarea>
+            </div>
+            
+            <div class="lg:col-span-2">
+              <label class="block text-sm font-semibold text-gray-900 mb-2">标签</label>
+              <input 
+                type="text" 
+                name="tags" 
+                placeholder="用逗号分隔多个标签，如：JavaScript, React, 前端"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+            </div>
+            
+            <div class="lg:col-span-2">
+              <label class="block text-sm font-semibold text-gray-900 mb-2">内容 *</label>
+              <textarea 
+                name="content" 
+                required 
+                rows="12"
+                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none font-mono text-sm"
+                placeholder="支持 Markdown 格式..."
+              ></textarea>
+            </div>
           </div>
           
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Slug *</label>
-            <input 
-              type="text" 
-              name="slug" 
-              required 
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          <div class="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
+            <button 
+              type="button" 
+              id="cancel-btn"
+              class="px-6 py-3 text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+            >
+              取消
+            </button>
+            <button 
+              type="submit"
+              class="px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            >
+              保存文章
+            </button>
           </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">分类 *</label>
-            <input 
-              type="text" 
-              name="category" 
-              required 
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">发布时间 *</label>
-            <input 
-              type="datetime-local" 
-              name="date" 
-              required 
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          
-          <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-1">封面图片URL *</label>
-            <input 
-              type="url" 
-              name="cover" 
-              required 
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          
-          <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-1">外部链接URL</label>
-            <input 
-              type="url" 
-              name="external_url" 
-              placeholder="https://example.com"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          
-          <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-1">描述 *</label>
-            <textarea 
-              name="des" 
-              required 
-              rows="3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            ></textarea>
-          </div>
-          
-          <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-1">标签 (用逗号分隔)</label>
-            <input 
-              type="text" 
-              name="tags" 
-              placeholder="标签1, 标签2, 标签3"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          
-          <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-700 mb-1">内容 *</label>
-            <textarea 
-              name="content" 
-              required 
-              rows="10"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            ></textarea>
-          </div>
-        </div>
-        
-        <div class="flex justify-end space-x-3 mt-6">
-          <button 
-            type="button" 
-            id="cancel-btn"
-            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md"
-          >
-            取消
-          </button>
-          <button 
-            type="submit"
-            class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md"
-          >
-            保存
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   </div>
-</Layout>
+</AdminLayout>
 
 <script>
 // 加载统计信息
@@ -270,6 +402,7 @@ async function loadStats() {
 
     loadPosts(postsArray)
     loadCategories(categoriesArray)
+    loadCategoriesOverview(categoriesArray)
   } catch (error) {
     console.error('加载统计信息失败:', error)
     // 显示错误信息
@@ -333,7 +466,26 @@ function loadPosts(posts: any[]) {
   `).join('')
 }
 
-// 加载分类列表
+// 加载分类概览
+function loadCategoriesOverview(categories) {
+  const container = document.getElementById('categories-overview')
+  if (!container) return
+
+  if (!Array.isArray(categories) || categories.length === 0) {
+    container.innerHTML = '<p class="text-sm text-gray-500">暂无分类</p>'
+    return
+  }
+
+  container.innerHTML = categories.slice(0, 5).map(category => `
+    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+      <div class="flex items-center space-x-2">
+        <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+        <span class="text-sm font-medium text-gray-900">${category.name}</span>
+      </div>
+      <span class="text-xs text-gray-500">${category.count} 篇</span>
+    </div>
+  `).join('')
+}
 function loadCategories(categories: any[]) {
   const tbody = document.getElementById('categories-table')!
   

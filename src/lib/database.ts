@@ -447,6 +447,57 @@ export class BlogDatabase {
     return newPostId
   }
 
+  // 搜索文章（搜索标题、描述和内容）
+  searchPosts(query: string): Post[] {
+    if (!query.trim()) {
+      return []
+    }
+
+    const searchTerm = `%${query.trim()}%`
+    
+    const searchQuery = `
+      SELECT 
+        p.*,
+        GROUP_CONCAT(t.name) as tags
+      FROM posts p
+      LEFT JOIN post_tags pt ON p.id = pt.post_id
+      LEFT JOIN tags t ON pt.tag_id = t.id
+      WHERE (
+        p.title LIKE ? COLLATE NOCASE
+        OR p.des LIKE ? COLLATE NOCASE
+        OR p.content LIKE ? COLLATE NOCASE
+        OR p.category LIKE ? COLLATE NOCASE
+        OR EXISTS (
+          SELECT 1 FROM post_tags pt2 
+          INNER JOIN tags t2 ON pt2.tag_id = t2.id 
+          WHERE pt2.post_id = p.id AND t2.name LIKE ? COLLATE NOCASE
+        )
+      )
+      GROUP BY p.id
+      ORDER BY 
+        CASE 
+          WHEN p.title LIKE ? COLLATE NOCASE THEN 1
+          WHEN p.des LIKE ? COLLATE NOCASE THEN 2
+          WHEN p.category LIKE ? COLLATE NOCASE THEN 3
+          ELSE 4
+        END,
+        p.date DESC
+    `
+
+    const rows = this.db.prepare(searchQuery).all(
+      searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, // WHERE 条件
+      searchTerm, searchTerm, searchTerm // ORDER BY 条件
+    ) as any[]
+
+    return rows.map(row => ({
+      ...row,
+      date: new Date(row.date),
+      created_at: new Date(row.created_at),
+      updated_at: new Date(row.updated_at),
+      tags: row.tags ? row.tags.split(',') : [],
+    }))
+  }
+
   // 关闭数据库连接
   close() {
     this.db.close()

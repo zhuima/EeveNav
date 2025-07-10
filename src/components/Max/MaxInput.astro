@@ -2,6 +2,168 @@
 const props = Astro.props
 ---
 
-<input class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50" {...props} />
+<div class="relative">
+  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+    <svg class="h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+    </svg>
+  </div>
+  <input 
+    id="sidebar-search-input"
+    class="flex h-10 w-full rounded-lg border border-gray-200 bg-white pl-10 pr-3 py-2 text-sm shadow-sm placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
+    placeholder="搜索文章..." 
+    type="text"
+    autocomplete="off"
+    {...props} 
+  />
+  
+  <!-- 搜索结果下拉框 -->
+  <div id="sidebar-search-results" class="hidden absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-80 overflow-y-auto z-50">
+    <div id="sidebar-search-loading" class="hidden p-4 text-center">
+      <div class="inline-block w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      <p class="mt-2 text-sm text-gray-500">搜索中...</p>
+    </div>
+    
+    <div id="sidebar-search-empty" class="p-4 text-center text-gray-500">
+      <p class="text-sm">开始输入以搜索文章</p>
+    </div>
+    
+    <div id="sidebar-search-items"></div>
+  </div>
+</div>
+
+<script>
+  // 侧边栏搜索功能
+  const sidebarSearchInput = document.getElementById('sidebar-search-input');
+  const sidebarSearchResults = document.getElementById('sidebar-search-results');
+  const sidebarSearchLoading = document.getElementById('sidebar-search-loading');
+  const sidebarSearchEmpty = document.getElementById('sidebar-search-empty');
+  const sidebarSearchItems = document.getElementById('sidebar-search-items');
+
+  let searchTimeout;
+
+  // 防抖搜索函数
+  function debouncedSearch(query) {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      performSearch(query);
+    }, 300);
+  }
+
+  // 执行搜索
+  async function performSearch(query) {
+    if (!query.trim()) {
+      hideSidebarSearchResults();
+      return;
+    }
+
+    // 显示结果框和加载状态
+    if (sidebarSearchResults) sidebarSearchResults.classList.remove('hidden');
+    if (sidebarSearchLoading) sidebarSearchLoading.classList.remove('hidden');
+    if (sidebarSearchEmpty) sidebarSearchEmpty.classList.add('hidden');
+    if (sidebarSearchItems) sidebarSearchItems.innerHTML = '';
+
+    try {
+      const response = await fetch(`/api/blog?search=${encodeURIComponent(query)}`);
+      const data = await response.json();
+      
+      // 隐藏加载状态
+      if (sidebarSearchLoading) sidebarSearchLoading.classList.add('hidden');
+
+      if (data.success && data.posts && data.posts.length > 0) {
+        displaySidebarSearchResults(data.posts);
+      } else {
+        if (sidebarSearchItems) {
+          sidebarSearchItems.innerHTML = `
+            <div class="p-4 text-center text-gray-500">
+              <p class="text-sm">没有找到相关文章</p>
+            </div>
+          `;
+        }
+      }
+    } catch (error) {
+      console.error('Sidebar search error:', error);
+      if (sidebarSearchLoading) sidebarSearchLoading.classList.add('hidden');
+      if (sidebarSearchItems) {
+        sidebarSearchItems.innerHTML = `
+          <div class="p-4 text-center text-red-500">
+            <p class="text-sm">搜索出错，请稍后重试</p>
+          </div>
+        `;
+      }
+    }
+  }
+
+  // 显示搜索结果
+  function displaySidebarSearchResults(posts) {
+    if (!sidebarSearchItems) return;
+
+    const resultsHTML = posts.slice(0, 6).map(post => `
+      <div class="px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-100 last:border-b-0" onclick="window.location.href='/posts/${post.slug}'">
+        <div class="flex items-start space-x-3">
+          <img src="${post.cover}" alt="${post.title}" class="w-10 h-10 object-cover rounded flex-shrink-0">
+          <div class="flex-1 min-w-0">
+            <h4 class="text-sm font-medium text-gray-900 truncate">${post.title}</h4>
+            <p class="text-xs text-gray-600 mt-1 line-clamp-2">${post.des}</p>
+            <div class="flex items-center mt-1">
+              <span class="inline-block px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">${post.category}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    sidebarSearchItems.innerHTML = resultsHTML;
+  }
+
+  // 隐藏搜索结果
+  function hideSidebarSearchResults() {
+    if (sidebarSearchResults) sidebarSearchResults.classList.add('hidden');
+    if (sidebarSearchLoading) sidebarSearchLoading.classList.add('hidden');
+    if (sidebarSearchEmpty) sidebarSearchEmpty.classList.remove('hidden');
+    if (sidebarSearchItems) sidebarSearchItems.innerHTML = '';
+  }
+
+  // 事件监听器
+  if (sidebarSearchInput) {
+    sidebarSearchInput.addEventListener('input', (e) => {
+      debouncedSearch(e.target.value);
+    });
+
+    // 焦点事件
+    sidebarSearchInput.addEventListener('focus', () => {
+      if (sidebarSearchInput.value.trim()) {
+        if (sidebarSearchResults) sidebarSearchResults.classList.remove('hidden');
+      }
+    });
+
+    // ESC键隐藏结果
+    sidebarSearchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        hideSidebarSearchResults();
+        sidebarSearchInput.blur();
+      }
+    });
+  }
+
+  // 点击外部隐藏结果
+  document.addEventListener('click', (e) => {
+    if (sidebarSearchResults && !sidebarSearchResults.contains(e.target) && e.target !== sidebarSearchInput) {
+      hideSidebarSearchResults();
+    }
+  });
+
+  // CSS样式
+  const sidebarSearchStyle = document.createElement('style');
+  sidebarSearchStyle.textContent = `
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  `;
+  document.head.appendChild(sidebarSearchStyle);
+</script>
 
 
