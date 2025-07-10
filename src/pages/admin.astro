@@ -87,6 +87,30 @@ await ensureDatabaseData()
         </table>
       </div>
     </div>
+    
+    <!-- 分类管理区域 -->
+    <div class="bg-white rounded-lg shadow mt-8">
+      <div class="p-6 border-b">
+        <h2 class="text-xl font-semibold">分类管理</h2>
+      </div>
+      
+      <div class="p-6">
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">分类名称</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">文章数量</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+              </tr>
+            </thead>
+            <tbody id="categories-table" class="bg-white divide-y divide-gray-200">
+              <!-- 动态内容 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- 添加/编辑文章模态框 -->
@@ -245,6 +269,7 @@ async function loadStats() {
     document.getElementById('tags-count')!.textContent = tagsArray.length.toString()
 
     loadPosts(postsArray)
+    loadCategories(categoriesArray)
   } catch (error) {
     console.error('加载统计信息失败:', error)
     // 显示错误信息
@@ -292,8 +317,44 @@ function loadPosts(posts: any[]) {
           编辑
         </button>
         <button 
+          onclick="window.copyPost(${post.id})"
+          class="text-green-600 hover:text-green-900 mr-3"
+        >
+          复制
+        </button>
+        <button 
           onclick="window.deletePost(${post.id})"
           class="text-red-600 hover:text-red-900"
+        >
+          删除
+        </button>
+      </td>
+    </tr>
+  `).join('')
+}
+
+// 加载分类列表
+function loadCategories(categories: any[]) {
+  const tbody = document.getElementById('categories-table')!
+  
+  if (!Array.isArray(categories) || categories.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4 text-gray-500">暂无分类</td></tr>'
+    return
+  }
+  
+  tbody.innerHTML = categories.map((category: any) => `
+    <tr>
+      <td class="px-6 py-4 whitespace-nowrap">
+        <div class="text-sm font-medium text-gray-900">${category.name || '未知分类'}</div>
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        ${category.count || 0} 篇文章
+      </td>
+      <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <button 
+          onclick="window.deleteCategory('${category.name}')"
+          class="text-red-600 hover:text-red-900"
+          ${category.count > 0 ? 'disabled title="有文章使用此分类，无法删除"' : ''}
         >
           删除
         </button>
@@ -501,6 +562,75 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('删除失败，请重试')
     }
   }
+
+  // 复制文章函数
+  window.copyPost = async (id: number) => {
+    // 从DOM中获取文章标题
+    const titleElement = document.querySelector(`button[onclick="window.copyPost(${id})"]`)
+      ?.closest('tr')
+      ?.querySelector('.text-gray-900')
+    const title = titleElement?.textContent || '未知文章'
+    
+    if (!confirm(`确定要复制文章 "${title}" 吗？`)) {
+      return
+    }
+
+    try {
+      const response = await fetch('/api/blog', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'copy-post',
+          data: { postId: id },
+        }),
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+        loadStats() // 重新加载数据
+        alert(`文章复制成功！新文章ID: ${result.id}`)
+      } else {
+        const error = await response.json()
+        alert(`复制失败: ${error.error}`)
+      }
+    } catch (error) {
+      console.error('复制失败:', error)
+      alert('复制失败，请重试')
+    }
+  }
+
+  // 删除分类函数
+  window.deleteCategory = async (categoryName: string) => {
+    if (!confirm(`确定要删除分类 "${categoryName}" 吗？`)) {
+      return
+    }
+
+    try {
+      const response = await fetch('/api/blog', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'delete-category',
+          data: { categoryName },
+        }),
+      })
+
+      if (response.ok) {
+        loadStats() // 重新加载数据
+        alert('分类删除成功！')
+      } else {
+        const error = await response.json()
+        alert(`删除失败: ${error.error}`)
+      }
+    } catch (error) {
+      console.error('删除失败:', error)
+      alert('删除失败，请重试')
+    }
+  }
 })
 
 // 声明全局函数
@@ -508,6 +638,8 @@ declare global {
   interface Window {
     editPost: (id: number) => void
     deletePost: (id: number) => void
+    copyPost: (id: number) => void
+    deleteCategory: (categoryName: string) => void
   }
 }
 </script>

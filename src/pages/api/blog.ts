@@ -190,7 +190,7 @@ export const POST: APIRoute = async ({ request }) => {
     if (!action) {
       return new Response(JSON.stringify({
         error: '缺少action字段',
-        availableActions: ['add', 'update', 'delete'],
+        availableActions: ['add', 'update', 'delete', 'delete-category', 'copy-post'],
         usage: 'POST请求需要包含action和data字段'
       }), {
         status: 400,
@@ -331,10 +331,63 @@ export const POST: APIRoute = async ({ request }) => {
         })
       }
 
+      case 'delete-category': {
+        const { categoryName } = data
+        if (!categoryName) {
+          return new Response(JSON.stringify({ error: '分类名称必需' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        }
+
+        try {
+          db.deleteCategory(categoryName)
+          return new Response(JSON.stringify({ message: '分类删除成功' }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        } catch (error) {
+          return new Response(JSON.stringify({ 
+            error: error instanceof Error ? error.message : '删除分类失败' 
+          }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        }
+      }
+
+      case 'copy-post': {
+        const { postId, newSlug } = data
+        if (!postId) {
+          return new Response(JSON.stringify({ error: '文章ID必需' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        }
+
+        try {
+          const newPostId = db.copyPost(postId, newSlug)
+          return new Response(JSON.stringify({ 
+            id: newPostId, 
+            message: '文章复制成功' 
+          }), {
+            status: 201,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        } catch (error) {
+          return new Response(JSON.stringify({ 
+            error: error instanceof Error ? error.message : '复制文章失败' 
+          }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        }
+      }
+
       default:
         return new Response(JSON.stringify({ 
           error: '无效的操作',
-          availableActions: ['add', 'update', 'delete'],
+          availableActions: ['add', 'update', 'delete', 'delete-category', 'copy-post'],
           usage: 'POST请求需要包含action和data字段',
           examples: {
             add: {
@@ -362,6 +415,19 @@ export const POST: APIRoute = async ({ request }) => {
               action: 'delete',
               data: {
                 id: 1
+              }
+            },
+            'delete-category': {
+              action: 'delete-category',
+              data: {
+                categoryName: '分类名称'
+              }
+            },
+            'copy-post': {
+              action: 'copy-post',
+              data: {
+                postId: 1,
+                newSlug: 'new-slug-name' // 可选
               }
             }
           }

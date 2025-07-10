@@ -377,6 +377,76 @@ export class BlogDatabase {
     this.db.prepare('DELETE FROM posts WHERE id = ?').run(id)
   }
 
+  // 删除分类
+  deleteCategory(categoryName: string) {
+    // 检查是否有文章使用该分类
+    const postsWithCategory = this.db.prepare('SELECT COUNT(*) as count FROM posts WHERE category = ?').get(categoryName) as { count: number }
+    
+    if (postsWithCategory.count > 0) {
+      throw new Error(`无法删除分类 "${categoryName}"，因为还有 ${postsWithCategory.count} 篇文章使用该分类`)
+    }
+
+    // 删除分类
+    const result = this.db.prepare('DELETE FROM categories WHERE name = ?').run(categoryName)
+    
+    if (result.changes === 0) {
+      throw new Error(`分类 "${categoryName}" 不存在`)
+    }
+
+    return result.changes
+  }
+
+  // 复制文章
+  copyPost(originalId: number, newSlug?: string): number {
+    // 获取原始文章
+    const originalPost = this.db.prepare(`
+      SELECT * FROM posts WHERE id = ?
+    `).get(originalId) as any
+
+    if (!originalPost) {
+      throw new Error('原始文章不存在')
+    }
+
+    // 获取原始文章的标签
+    const originalTags = this.db.prepare(`
+      SELECT t.name 
+      FROM tags t 
+      INNER JOIN post_tags pt ON t.id = pt.tag_id 
+      WHERE pt.post_id = ?
+    `).all(originalId) as { name: string }[]
+
+    const now = new Date().toISOString()
+    
+    // 生成新的slug
+    const baseSlug = newSlug || `${originalPost.slug}-copy`
+    let finalSlug = baseSlug
+    let counter = 1
+
+    // 确保slug是唯一的
+    while (this.getPostBySlug(finalSlug)) {
+      finalSlug = `${baseSlug}-${counter}`
+      counter++
+    }
+
+    // 创建复制的文章数据
+    const copyData = {
+      title: `${originalPost.title} (副本)`,
+      date: new Date(originalPost.date),
+      des: originalPost.des,
+      cover: originalPost.cover,
+      category: originalPost.category,
+      content: originalPost.content,
+      slug: finalSlug,
+      external_url: originalPost.external_url,
+      tags: originalTags.map(tag => tag.name)
+    }
+
+    // 插入新文章
+    const newPostId = this.addPost(copyData)
+    
+    return newPostId
+  }
+
   // 关闭数据库连接
   close() {
     this.db.close()
