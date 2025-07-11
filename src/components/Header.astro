@@ -331,7 +331,7 @@ const navs = [
   const searchModal = document.getElementById('search-modal');
   const searchOverlay = document.getElementById('search-overlay');
   const closeSearchModal = document.getElementById('close-search-modal');
-  const globalSearchInput = document.getElementById('global-search-input');
+  const globalSearchInput = document.getElementById('global-search-input') as HTMLInputElement;
   const searchLoading = document.getElementById('search-loading');
   const searchEmpty = document.getElementById('search-empty');
   const searchItems = document.getElementById('search-items');
@@ -468,7 +468,7 @@ const navs = [
   if (globalSearchInput) {
     const debouncedSearch = debounce(searchResources, 300);
     globalSearchInput.addEventListener('input', (e) => {
-      debouncedSearch(e.target.value);
+      debouncedSearch((e.target as HTMLInputElement).value);
     });
 
     // ESC键关闭模态框

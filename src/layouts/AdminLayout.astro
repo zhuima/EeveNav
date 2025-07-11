@@ -55,10 +55,12 @@ const navigationItems = [
   <title>{title} - EeveNav 管理后台</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {}
+    if (typeof window !== 'undefined' && (window as any).tailwind) {
+      (window as any).tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {}
+        }
       }
     }
   </script>

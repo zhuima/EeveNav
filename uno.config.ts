@@ -23,8 +23,6 @@ export default defineConfig({
       'primary': '#dc2626',
     },
   },
-  // 添加暗色模式支持
-  darkMode: 'class',
   // 添加暗色模式相关的规则
   rules: [
     // 暗色模式背景

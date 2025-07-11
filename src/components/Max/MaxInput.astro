@@ -34,7 +34,7 @@ const props = Astro.props
 
 <script>
   // 侧边栏搜索功能
-  const sidebarSearchInput = document.getElementById('sidebar-search-input');
+  const sidebarSearchInput = document.getElementById('sidebar-search-input') as HTMLInputElement;
   const sidebarSearchResults = document.getElementById('sidebar-search-results');
   const sidebarSearchLoading = document.getElementById('sidebar-search-loading');
   const sidebarSearchEmpty = document.getElementById('sidebar-search-empty');
@@ -127,7 +127,7 @@ const props = Astro.props
   // 事件监听器
   if (sidebarSearchInput) {
     sidebarSearchInput.addEventListener('input', (e) => {
-      debouncedSearch(e.target.value);
+      debouncedSearch((e.target as HTMLInputElement).value);
     });
 
     // 焦点事件
@@ -148,7 +148,7 @@ const props = Astro.props
 
   // 点击外部隐藏结果
   document.addEventListener('click', (e) => {
-    if (sidebarSearchResults && !sidebarSearchResults.contains(e.target) && e.target !== sidebarSearchInput) {
+    if (sidebarSearchResults && !sidebarSearchResults.contains(e.target as Node) && e.target !== sidebarSearchInput) {
       hideSidebarSearchResults();
     }
   });
