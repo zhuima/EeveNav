@@ -314,7 +314,7 @@ if (Astro.request.method === 'POST') {
     }
 
     // 添加加载动画到提交按钮
-    const submitButton = form?.querySelector('button[type="submit"]')
+    const submitButton = form?.querySelector('button[type="submit"]') as HTMLButtonElement
     if (submitButton && form) {
       form.addEventListener('submit', () => {
         (submitButton as HTMLButtonElement).disabled = true
