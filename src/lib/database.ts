@@ -25,8 +25,8 @@ export class BlogDatabase {
 
   constructor(url?: string, authToken?: string) {
     // 优先使用传入的参数，然后是环境变量，最后是hardcoded fallback
-    const dbUrl = url || process.env.TURSO_DATABASE_URL
-    const dbToken = authToken || process.env.TURSO_AUTH_TOKEN
+    const dbUrl = url || process.env.TURSO_DATABASE_URL || 'libsql://jinju-zhuima.aws-ap-northeast-1.turso.io'
+    const dbToken = authToken || process.env.TURSO_AUTH_TOKEN || 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NTIyOTM0MjQsImlkIjoiOWZiNDEwMDktMjA4Mi00YTc1LWJkYzMtYWRlYWNkOTU5Nzk5IiwicmlkIjoiNGY3OTE3M2UtMWRjNC00NDBiLTkyMDgtZTA0OTVjNTE3NjZhIn0.oM4IIZbb6ut1ss_mfY0AtjR4q_8-3zsnxv6MwbqeonAp2qvA8eatYWMgxVLBafyNkCwr5ND4J110pV6qe_ybDg'
     
     this.db = createClient({
       url: dbUrl,
@@ -543,6 +543,118 @@ export class BlogDatabase {
     })
     const rows = result.rows as any[]
 
+    return rows.map(row => ({
+      ...row,
+      date: new Date(row.date),
+      created_at: new Date(row.created_at),
+      updated_at: new Date(row.updated_at),
+      tags: row.tags ? row.tags.split(',') : [],
+    }))
+  }
+
+  // 获取相关文章（基于分类和标签）
+  async getRelatedPosts(postId: number, limit: number = 4): Promise<Post[]> {
+    await this.initialized
+    
+    // 首先获取当前文章的分类和标签
+    const currentPostResult = await this.db.execute({
+      sql: `
+        SELECT p.category, GROUP_CONCAT(t.name) as tags
+        FROM posts p
+        LEFT JOIN post_tags pt ON p.id = pt.post_id
+        LEFT JOIN tags t ON pt.tag_id = t.id
+        WHERE p.id = ?
+        GROUP BY p.id
+      `,
+      args: [postId]
+    })
+
+    if (!currentPostResult.rows[0]) {
+      return []
+    }
+
+    const currentPost = currentPostResult.rows[0] as { category: string, tags: string | null }
+    const currentTags = currentPost.tags ? currentPost.tags.split(',') : []
+
+    // 如果没有标签，只按分类查找
+    if (currentTags.length === 0) {
+      const result = await this.db.execute({
+        sql: `
+          SELECT 
+            p.*,
+            GROUP_CONCAT(t.name) as tags
+          FROM posts p
+          LEFT JOIN post_tags pt ON p.id = pt.post_id
+          LEFT JOIN tags t ON pt.tag_id = t.id
+          WHERE p.id != ? AND p.category = ?
+          GROUP BY p.id
+          ORDER BY p.date DESC
+          LIMIT ?
+        `,
+        args: [postId, currentPost.category, limit]
+      })
+
+      const rows = result.rows as any[]
+      return rows.map(row => ({
+        ...row,
+        date: new Date(row.date),
+        created_at: new Date(row.created_at),
+        updated_at: new Date(row.updated_at),
+        tags: row.tags ? row.tags.split(',') : [],
+      }))
+    }
+
+    // 查找相关文章 - 优先级：相同分类+共同标签 > 相同分类 > 共同标签
+    const placeholders = currentTags.map(() => '?').join(',')
+    const relatedQuery = `
+      SELECT 
+        p.*,
+        GROUP_CONCAT(t.name) as tags,
+        CASE 
+          WHEN p.category = ? THEN 2
+          ELSE 0
+        END +
+        CASE 
+          WHEN EXISTS (
+            SELECT 1 FROM post_tags pt2 
+            INNER JOIN tags t2 ON pt2.tag_id = t2.id 
+            WHERE pt2.post_id = p.id AND t2.name IN (${placeholders})
+          ) THEN 1
+          ELSE 0
+        END as relevance_score
+      FROM posts p
+      LEFT JOIN post_tags pt ON p.id = pt.post_id
+      LEFT JOIN tags t ON pt.tag_id = t.id
+      WHERE p.id != ? 
+        AND (
+          p.category = ? 
+          OR EXISTS (
+            SELECT 1 FROM post_tags pt3 
+            INNER JOIN tags t3 ON pt3.tag_id = t3.id 
+            WHERE pt3.post_id = p.id AND t3.name IN (${placeholders})
+          )
+        )
+      GROUP BY p.id
+      HAVING relevance_score > 0
+      ORDER BY relevance_score DESC, p.date DESC
+      LIMIT ?
+    `
+
+    const args = [
+      currentPost.category,  // 第一个分类条件
+      ...currentTags,        // 标签条件1
+      postId,               // 排除当前文章
+      currentPost.category,  // 第二个分类条件
+      ...currentTags,        // 标签条件2
+      limit                 // 限制数量
+    ]
+
+    const result = await this.db.execute({
+      sql: relatedQuery,
+      args: args
+    })
+
+    const rows = result.rows as any[]
     return rows.map(row => ({
       ...row,
       date: new Date(row.date),

@@ -10,15 +10,29 @@ const db = getDatabase()
 const posts = await db.getPosts()
 const categories = await db.getCategories()
 const tags = await db.getTags()
+
+// SEO配置
+const seoConfig = {
+  title: 'EeveNav - 精选资源导航 | 发现优质工具、教程与灵感',
+  description: `精心整理的${posts.length}+优质资源，涵盖${categories.length}个分类。包含开发工具、设计资源、学习教程、AI工具等。让每一次搜索都有价值，助力您的创意与开发工作。`,
+  keywords: [
+    '资源导航', '开发工具', '设计资源', '学习教程', '创意灵感', 
+    'AI工具', '免费图标', '编程学习', '前端开发', '设计工具',
+    'EeveNav', '资源收藏', '工具推荐', '技术博客'
+  ],
+  type: 'website' as const,
+  image: '/og-home.jpg',
+  imageAlt: 'EeveNav - 精选资源导航，发现优质工具、教程与灵感'
+}
 ---
 
-<Layout title="EeveNav - 精选资源导航">
+<Layout {...seoConfig}>
   <main class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
     <!-- Hero Section - 搜索为中心 -->
     <section class="w-full px-6 pt-16 pb-12">
       <div class="max-w-5xl mx-auto text-center">
         <!-- 主标题 -->
-        <div class="mb-8">
+        <header class="mb-8">
           <h1 class="text-6xl md:text-7xl font-bold tracking-tight mb-4">
             <span class="bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
               发现
@@ -32,7 +46,7 @@ const tags = await db.getTags()
             <br>
             <span class="text-gray-500">让每一次搜索都有价值</span>
           </p>
-        </div>
+        </header>
         
         <!-- 核心搜索区域 -->
         <div class="relative max-w-4xl mx-auto mb-16">
@@ -44,7 +58,7 @@ const tags = await db.getTags()
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
                 <div class="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl">
-                  <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <svg class="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                     <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
                   </svg>
                 </div>
@@ -52,8 +66,12 @@ const tags = await db.getTags()
               <input 
                 type="text" 
                 id="search-input"
+                name="search"
                 placeholder="搜索你需要的资源、工具、文章..." 
                 class="w-full pl-20 pr-6 py-6 text-xl font-medium bg-transparent border-0 focus:outline-none focus:ring-0 placeholder-gray-400 text-gray-900"
+                autocomplete="off"
+                role="searchbox"
+                aria-label="搜索资源"
               />
               <!-- 搜索建议 -->
               <div class="absolute right-6 top-1/2 transform -translate-y-1/2 flex items-center space-x-2 text-sm text-gray-400">
@@ -65,10 +83,10 @@ const tags = await db.getTags()
             <!-- 热门搜索标签 -->
             <div class="flex flex-wrap justify-center gap-2 mt-6 pt-6 border-t border-gray-100">
               <span class="text-sm text-gray-500 mr-2">热门：</span>
-              <button class="px-3 py-1 text-sm text-blue-600 bg-blue-50 rounded-full hover:bg-blue-100 transition-colors">设计工具</button>
-              <button class="px-3 py-1 text-sm text-purple-600 bg-purple-50 rounded-full hover:bg-purple-100 transition-colors">开发资源</button>
-              <button class="px-3 py-1 text-sm text-green-600 bg-green-50 rounded-full hover:bg-green-100 transition-colors">免费图标</button>
-              <button class="px-3 py-1 text-sm text-orange-600 bg-orange-50 rounded-full hover:bg-orange-100 transition-colors">AI 工具</button>
+              <button class="hot-tag px-3 py-1 text-sm text-blue-600 bg-blue-50 rounded-full hover:bg-blue-100 transition-colors" data-search="设计工具" aria-label="搜索设计工具">设计工具</button>
+              <button class="hot-tag px-3 py-1 text-sm text-purple-600 bg-purple-50 rounded-full hover:bg-purple-100 transition-colors" data-search="开发资源" aria-label="搜索开发资源">开发资源</button>
+              <button class="hot-tag px-3 py-1 text-sm text-green-600 bg-green-50 rounded-full hover:bg-green-100 transition-colors" data-search="免费图标" aria-label="搜索免费图标">免费图标</button>
+              <button class="hot-tag px-3 py-1 text-sm text-orange-600 bg-orange-50 rounded-full hover:bg-orange-100 transition-colors" data-search="AI 工具" aria-label="搜索AI工具">AI 工具</button>
             </div>
           </div>
         </div>
@@ -76,15 +94,15 @@ const tags = await db.getTags()
         <!-- 统计信息 -->
         <div class="grid grid-cols-3 gap-8 max-w-2xl mx-auto mb-12">
           <div class="text-center">
-            <div class="text-3xl font-bold text-gray-900">{posts.length}</div>
+            <div class="text-3xl font-bold text-gray-900" aria-label={`共${posts.length}个精选资源`}>{posts.length}</div>
             <div class="text-sm text-gray-500 font-medium">精选资源</div>
           </div>
           <div class="text-center">
-            <div class="text-3xl font-bold text-gray-900">{categories.length}</div>
+            <div class="text-3xl font-bold text-gray-900" aria-label={`共${categories.length}个分类`}>{categories.length}</div>
             <div class="text-sm text-gray-500 font-medium">分类</div>
           </div>
           <div class="text-center">
-            <div class="text-3xl font-bold text-gray-900">{tags.length}</div>
+            <div class="text-3xl font-bold text-gray-900" aria-label={`共${tags.length}个标签`}>{tags.length}</div>
             <div class="text-sm text-gray-500 font-medium">标签</div>
           </div>
         </div>
@@ -92,12 +110,15 @@ const tags = await db.getTags()
     </section>
 
     <!-- 分类过滤器 -->
-    <section class="w-full px-6 mb-12">
+    <section class="w-full px-6 mb-12" aria-label="资源分类过滤器">
       <div class="max-w-6xl mx-auto">
-        <div class="flex flex-wrap justify-center gap-3 mb-12">
+        <h2 class="sr-only">按分类筛选资源</h2>
+        <div class="flex flex-wrap justify-center gap-3 mb-12" role="group" aria-label="分类筛选按钮">
           <button 
             class="filter-btn active px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300 bg-gray-900 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             data-category="all"
+            aria-pressed="true"
+            aria-label="显示全部资源"
           >
             全部资源
           </button>
@@ -105,6 +126,8 @@ const tags = await db.getTags()
             <button 
               class="filter-btn px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300 bg-white text-gray-700 hover:bg-gray-50 shadow-md hover:shadow-lg border border-gray-200 transform hover:-translate-y-0.5"
               data-category={category.name}
+              aria-pressed="false"
+              aria-label={`显示${category.name}分类，共${category.count}个资源`}
             >
               {category.name}
               <span class="ml-2 px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded-full">{category.count}</span>
@@ -115,24 +138,28 @@ const tags = await db.getTags()
     </section>
 
     <!-- 资源卡片网格 -->
-    <section class="w-full px-6 pb-20">
+    <section class="w-full px-6 pb-20" aria-label="资源列表">
       <div class="max-w-7xl mx-auto">
+        <h2 class="sr-only">精选资源列表</h2>
         <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {posts.map(post => (
-            <div 
+            <article 
               class="resource-card group bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100/50 overflow-hidden"
               data-category={post.category}
               data-tags={post.tags.join(',')}
               data-title={post.title.toLowerCase()}
               data-description={post.des.toLowerCase()}
+              itemscope
+              itemtype="https://schema.org/CreativeWork"
             >
               <!-- 封面图片 -->
               <div class="relative overflow-hidden bg-gray-50">
                 <img 
                   src={post.cover} 
-                  alt={post.title}
+                  alt={`${post.title}的预览图`}
                   class="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
                   loading="lazy"
+                  itemprop="image"
                 />
                 <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
@@ -140,23 +167,23 @@ const tags = await db.getTags()
               <div class="p-6">
                 <!-- 分类标签 -->
                 <div class="flex items-center justify-between mb-3">
-                  <span class="inline-block px-3 py-1 text-xs font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full">
+                  <span class="inline-block px-3 py-1 text-xs font-semibold bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full" itemprop="genre">
                     {post.category}
                   </span>
                 </div>
                 
                 <!-- 标题和描述 -->
-                <h3 class="font-bold text-gray-900 mb-3 line-clamp-2 text-lg group-hover:text-blue-600 transition-colors">
+                <h3 class="font-bold text-gray-900 mb-3 line-clamp-2 text-lg group-hover:text-blue-600 transition-colors" itemprop="name">
                   {post.title}
                 </h3>
-                <p class="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">
+                <p class="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed" itemprop="description">
                   {post.des}
                 </p>
                 
                 <!-- 标签 -->
                 <div class="flex flex-wrap gap-1 mb-6">
                   {post.tags.slice(0, 3).map(tag => (
-                    <span class="inline-block px-2 py-1 text-xs bg-gray-50 text-gray-600 rounded-md font-medium">
+                    <span class="inline-block px-2 py-1 text-xs bg-gray-50 text-gray-600 rounded-md font-medium" itemprop="keywords">
                       {tag}
                     </span>
                   ))}
@@ -175,9 +202,11 @@ const tags = await db.getTags()
                       target="_blank"
                       rel="noopener noreferrer"
                       class="flex-1 inline-flex items-center justify-center px-4 py-2 text-sm font-semibold bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                      aria-label={`访问${post.title}的官方网站`}
+                      itemprop="url"
                     >
                       访问
-                      <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                       </svg>
                     </a>
@@ -185,20 +214,21 @@ const tags = await db.getTags()
                   <a 
                     href={`/posts/${post.slug}`}
                     class="flex-1 inline-flex items-center justify-center px-4 py-2 text-sm font-semibold bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 transform hover:-translate-y-0.5"
+                    aria-label={`查看${post.title}的详细信息`}
                   >
                     详情
                   </a>
                 </div>
               </div>
-            </div>
+            </article>
           ))}
         </div>
         
         <!-- 无结果提示 -->
-        <div id="no-results" class="hidden text-center py-20">
+        <div id="no-results" class="hidden text-center py-20" role="status" aria-live="polite">
           <div class="max-w-md mx-auto">
             <div class="w-20 h-20 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-              <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
             </div>
@@ -207,6 +237,7 @@ const tags = await db.getTags()
             <button 
               onclick="document.getElementById('search-input').value = ''; document.querySelector('[data-category=all]').click();"
               class="inline-flex items-center px-6 py-3 text-sm font-semibold bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
+              aria-label="清空搜索条件并重新开始"
             >
               重新搜索
             </button>
@@ -276,22 +307,40 @@ const tags = await db.getTags()
       activeBtn.classList.remove('bg-white', 'text-gray-700', 'border', 'border-gray-200', 'shadow-md')
     }
 
+    // 如果点击分类按钮时搜索框有内容，清空搜索框以避免冲突
+    if (searchInput.value.trim()) {
+      searchInput.value = ''
+    }
+
     // 重新搜索以应用新的分类过滤
-    searchResources(searchInput.value)
+    searchResources('')
   }
 
   // 热门搜索标签点击事件
   function setupHotSearchTags() {
-    const hotTags = document.querySelectorAll('[class*="bg-blue-50"], [class*="bg-purple-50"], [class*="bg-green-50"], [class*="bg-orange-50"]')
+    const hotTags = document.querySelectorAll('.hot-tag') as NodeListOf<HTMLButtonElement>
     hotTags.forEach(tag => {
-      if (tag.tagName === 'BUTTON') {
-        tag.addEventListener('click', () => {
-          const tagText = tag.textContent || ''
-          searchInput.value = tagText
-          searchInput.focus()
-          searchResources(tagText)
+      tag.addEventListener('click', (e) => {
+        e.preventDefault()
+        const searchTerm = tag.dataset.search || tag.textContent || ''
+        
+        // 重置分类过滤到"全部资源"
+        currentCategory = 'all'
+        filterBtns.forEach(btn => {
+          btn.classList.remove('active', 'bg-gray-900', 'text-white', 'shadow-lg')
+          btn.classList.add('bg-white', 'text-gray-700', 'border', 'border-gray-200', 'shadow-md')
         })
-      }
+        const allBtn = document.querySelector(`[data-category="all"]`) as HTMLButtonElement
+        if (allBtn) {
+          allBtn.classList.add('active', 'bg-gray-900', 'text-white', 'shadow-lg')
+          allBtn.classList.remove('bg-white', 'text-gray-700', 'border', 'border-gray-200', 'shadow-md')
+        }
+        
+        // 设置搜索值并执行搜索
+        searchInput.value = searchTerm
+        searchInput.focus()
+        searchResources(searchTerm)
+      })
     })
   }
 

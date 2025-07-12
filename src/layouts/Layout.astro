@@ -1,23 +1,99 @@
 ---
 import Footer from '@/components/Footer.astro'
 import Header from '@/components/Header.astro'
+import SEOHead from '@/components/SEOHead.astro'
 
-const { title } = Astro.props;
+export interface Props {
+  title?: string;
+  description?: string;
+  keywords?: string[];
+  image?: string;
+  imageAlt?: string;
+  type?: 'website' | 'article';
+  author?: string;
+  publishDate?: Date;
+  modifiedDate?: Date;
+  category?: string;
+  tags?: string[];
+  noindex?: boolean;
+  canonicalUrl?: string;
+}
+
+const seoProps = Astro.props;
 ---
 
-<html lang="en">
+<!DOCTYPE html>
+<html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <!-- SEO优化 -->
+    <SEOHead {...seoProps} />
+    
+    <!-- 样式 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Tailwind配置
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              'sans': ['system-ui', 'sans-serif'],
+            }
+          }
+        }
+      }
+    </script>
+    
+    <!-- 性能优化 -->
+    <style>
+      /* 防止布局偏移 */
+      .resource-card {
+        contain: layout style paint;
+      }
+      
+      /* 图片懒加载优化 */
+      img[loading="lazy"] {
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      
+      img[loading="lazy"].loaded {
+        opacity: 1;
+      }
+      
+      /* 字体优化 */
+      body {
+        font-display: swap;
+      }
+    </style>
   </head>
   <body class="min-h-screen bg-background dark:bg-slate-900 text-foreground dark:text-slate-100 font-sans antialiased">
     <div class="relative flex min-h-screen flex-col">
       <Header />
-      <main class="flex-1 container mx-auto">
+      <main class="flex-1">
         <slot />
       </main>
       <Footer />
     </div>
+    
+    <!-- 图片懒加载脚本 -->
+    <script>
+      // 图片懒加载增强
+      document.addEventListener('DOMContentLoaded', () => {
+        const images = document.querySelectorAll('img[loading="lazy"]') as NodeListOf<HTMLImageElement>;
+        images.forEach(img => {
+          if (img.complete) {
+            img.classList.add('loaded');
+          } else {
+            img.addEventListener('load', () => {
+              img.classList.add('loaded');
+            });
+          }
+        });
+      });
+    </script>
   </body>
-  <style></style>
 </html>

@@ -2,7 +2,14 @@
 import Sidebar from '@/components/Sidebar.astro'
 ---
 
-<div class="flex mt-10">
-    <slot />
-    <Sidebar />
+<div class="flex mt-10 gap-8">
+    <div class="flex-1 min-w-0">
+      <slot />
+    </div>
+    <div class="hidden lg:block w-80 flex-shrink-0">
+      <!-- 粘性侧边栏容器，适合放广告 -->
+      <div class="sticky top-24">
+        <Sidebar />
+      </div>
+    </div>
   </div>
