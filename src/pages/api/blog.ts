@@ -85,13 +85,19 @@ export const GET: APIRoute = async ({ url, request }) => {
         try {
           const categories = await db.getCategories()
           console.log('Categories found:', categories.length)
-          return new Response(JSON.stringify(categories), {
+          return new Response(JSON.stringify({
+            success: true,
+            categories: categories
+          }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
           })
         } catch (dbError) {
           console.error('Database error getting categories:', dbError)
-          return new Response(JSON.stringify([]), {
+          return new Response(JSON.stringify({
+            success: false,
+            categories: []
+          }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
           })
@@ -301,7 +307,10 @@ export const POST: APIRoute = async ({ request }) => {
       case 'update': {
         const { id, ...updateData } = data
         if (!id) {
-          return new Response(JSON.stringify({ error: '文章ID必需' }), {
+          return new Response(JSON.stringify({ 
+            success: false,
+            error: '文章ID必需' 
+          }), {
             status: 400,
             headers: { 'Content-Type': 'application/json' },
           })
@@ -313,6 +322,7 @@ export const POST: APIRoute = async ({ request }) => {
             updateData.date = new Date(updateData.date);
             if (isNaN(updateData.date.getTime())) {
               return new Response(JSON.stringify({ 
+                success: false,
                 error: '日期格式无效',
                 details: '请提供有效的日期格式，如 ISO 格式 (YYYY-MM-DD 或 YYYY-MM-DDTHH:MM:SS.sssZ)'
               }), {
@@ -326,13 +336,17 @@ export const POST: APIRoute = async ({ request }) => {
           const validatedUpdateData = PostSchema.omit({ id: true, created_at: true, updated_at: true }).partial().parse(updateData)
 
           await db.updatePost(id, validatedUpdateData)
-          return new Response(JSON.stringify({ message: '文章更新成功' }), {
+          return new Response(JSON.stringify({ 
+            success: true,
+            message: '文章更新成功' 
+          }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
           })
         } catch (validationError) {
           console.error('验证错误:', validationError);
           return new Response(JSON.stringify({ 
+            success: false,
             error: '数据验证失败', 
             details: validationError instanceof Error ? validationError.message : '未知验证错误',
             help: '确保日期字段是有效的日期格式，如 ISO 格式 (YYYY-MM-DD 或 YYYY-MM-DDTHH:MM:SS.sssZ)'
