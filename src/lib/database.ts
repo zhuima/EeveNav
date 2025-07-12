@@ -1,5 +1,5 @@
 import { z } from 'astro:content'
-import Database from 'better-sqlite3'
+import { createClient } from '@libsql/client'
 
 // 数据验证模式
 export const PostSchema = z.object({
@@ -20,14 +20,18 @@ export const PostSchema = z.object({
 export type Post = z.infer<typeof PostSchema>
 
 export class BlogDatabase {
-  private db: Database.Database
+  private db: any
+  private initialized: Promise<void>
 
-  constructor(dbPath: string = 'blog.db') {
-    this.db = new Database(dbPath)
-    this.initTables()
+  constructor(url?: string, authToken?: string) {
+    this.db = createClient({
+      url: url || process.env.TURSO_DATABASE_URL || 'file:blog.db',
+      authToken: authToken || process.env.TURSO_AUTH_TOKEN,
+    })
+    this.initialized = this.initTables()
   }
 
-  private initTables() {
+  private async initTables() {
     // 创建文章表
     const createPostsTable = `
       CREATE TABLE IF NOT EXISTS posts (
@@ -83,84 +87,84 @@ export class BlogDatabase {
       'CREATE INDEX IF NOT EXISTS idx_post_tags_tag_id ON post_tags(tag_id)',
     ]
 
-    this.db.exec(createPostsTable)
-    this.db.exec(createTagsTable)
-    this.db.exec(createPostTagsTable)
-    this.db.exec(createCategoriesTable)
+    await this.db.execute(createPostsTable)
+    await this.db.execute(createTagsTable)
+    await this.db.execute(createPostTagsTable)
+    await this.db.execute(createCategoriesTable)
 
-    createIndexes.forEach(index => this.db.exec(index))
+    for (const index of createIndexes) {
+      await this.db.execute(index)
+    }
   }
 
   // 添加文章
-  addPost(postData: Omit<Post, 'id' | 'created_at' | 'updated_at'>): number {
+  async addPost(postData: Omit<Post, 'id' | 'created_at' | 'updated_at'>): Promise<number> {
+    await this.initialized
     // 验证数据
     const validatedData = PostSchema.omit({ id: true, created_at: true, updated_at: true }).parse(postData)
 
     const now = new Date().toISOString()
 
     // 插入分类（如果不存在）
-    const insertCategory = this.db.prepare(`
-      INSERT OR IGNORE INTO categories (name) VALUES (?)
-    `)
-    insertCategory.run(validatedData.category)
+    await this.db.execute({
+      sql: 'INSERT OR IGNORE INTO categories (name) VALUES (?)',
+      args: [validatedData.category]
+    })
 
     // 插入文章
-    const insertPost = this.db.prepare(`
-      INSERT INTO posts (title, date, des, cover, category, content, slug, external_url, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `)
+    const result = await this.db.execute({
+      sql: 'INSERT INTO posts (title, date, des, cover, category, content, slug, external_url, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      args: [
+        validatedData.title,
+        validatedData.date.toISOString(),
+        validatedData.des,
+        validatedData.cover,
+        validatedData.category,
+        validatedData.content,
+        validatedData.slug,
+        validatedData.external_url || null,
+        now,
+        now,
+      ]
+    })
 
-    const result = insertPost.run(
-      validatedData.title,
-      validatedData.date.toISOString(),
-      validatedData.des,
-      validatedData.cover,
-      validatedData.category,
-      validatedData.content,
-      validatedData.slug,
-      validatedData.external_url || null,
-      now,
-      now,
-    )
-
-    const postId = result.lastInsertRowid as number
+    const postId = Number(result.lastInsertRowid)
 
     // 处理标签
     if (validatedData.tags && validatedData.tags.length > 0) {
-      this.addTagsToPost(postId, validatedData.tags)
+      await this.addTagsToPost(postId, validatedData.tags)
     }
 
     return postId
   }
 
   // 为文章添加标签
-  private addTagsToPost(postId: number, tags: string[]) {
-    const insertTag = this.db.prepare(`
-      INSERT OR IGNORE INTO tags (name) VALUES (?)
-    `)
-
-    const getTagId = this.db.prepare(`
-      SELECT id FROM tags WHERE name = ?
-    `)
-
-    const insertPostTag = this.db.prepare(`
-      INSERT OR IGNORE INTO post_tags (post_id, tag_id) VALUES (?, ?)
-    `)
-
-    tags.forEach((tagName) => {
+  private async addTagsToPost(postId: number, tags: string[]) {
+    for (const tagName of tags) {
       // 插入标签（如果不存在）
-      insertTag.run(tagName)
+      await this.db.execute({
+        sql: 'INSERT OR IGNORE INTO tags (name) VALUES (?)',
+        args: [tagName]
+      })
 
       // 获取标签ID
-      const tag = getTagId.get(tagName) as { id: number }
+      const tagResult = await this.db.execute({
+        sql: 'SELECT id FROM tags WHERE name = ?',
+        args: [tagName]
+      })
+      const tag = tagResult.rows[0] as { id: number }
 
       // 关联文章和标签
-      insertPostTag.run(postId, tag.id)
-    })
+      await this.db.execute({
+        sql: 'INSERT OR IGNORE INTO post_tags (post_id, tag_id) VALUES (?, ?)',
+        args: [postId, tag.id]
+      })
+    }
   }
 
   // 获取所有文章
-  getPosts(): Post[] {
+  async getPosts(): Promise<Post[]> {
+    await this.initialized
     const query = `
       SELECT 
         p.*,
@@ -172,7 +176,8 @@ export class BlogDatabase {
       ORDER BY p.date DESC
     `
 
-    const rows = this.db.prepare(query).all() as any[]
+    const result = await this.db.execute(query)
+    const rows = result.rows as any[]
 
     return rows.map(row => ({
       ...row,
@@ -184,7 +189,8 @@ export class BlogDatabase {
   }
 
   // 根据slug获取文章
-  getPostBySlug(slug: string): Post | null {
+  async getPostBySlug(slug: string): Promise<Post | null> {
+    await this.initialized
     const query = `
       SELECT 
         p.*,
@@ -196,7 +202,11 @@ export class BlogDatabase {
       GROUP BY p.id
     `
 
-    const row = this.db.prepare(query).get(slug) as any
+    const result = await this.db.execute({
+      sql: query,
+      args: [slug]
+    })
+    const row = result.rows[0] as any
 
     if (!row)
       return null
@@ -211,7 +221,8 @@ export class BlogDatabase {
   }
 
   // 获取分类和文章数量
-  getCategories(): { name: string, count: number }[] {
+  async getCategories(): Promise<{ name: string, count: number }[]> {
+    await this.initialized
     const query = `
       SELECT 
         c.name,
@@ -222,11 +233,13 @@ export class BlogDatabase {
       ORDER BY count DESC, c.name
     `
 
-    return this.db.prepare(query).all() as { name: string, count: number }[]
+    const result = await this.db.execute(query)
+    return result.rows as { name: string, count: number }[]
   }
 
   // 获取所有标签
-  getTags(): string[] {
+  async getTags(): Promise<string[]> {
+    await this.initialized
     const query = `
       SELECT DISTINCT t.name
       FROM tags t
@@ -234,12 +247,14 @@ export class BlogDatabase {
       ORDER BY t.name
     `
 
-    const rows = this.db.prepare(query).all() as { name: string }[]
+    const result = await this.db.execute(query)
+    const rows = result.rows as { name: string }[]
     return rows.map(row => row.name)
   }
 
   // 根据分类获取文章
-  getPostsByCategory(category: string): Post[] {
+  async getPostsByCategory(category: string): Promise<Post[]> {
+    await this.initialized
     const query = `
       SELECT 
         p.*,
@@ -252,7 +267,11 @@ export class BlogDatabase {
       ORDER BY p.date DESC
     `
 
-    const rows = this.db.prepare(query).all(category) as any[]
+    const result = await this.db.execute({
+      sql: query,
+      args: [category]
+    })
+    const rows = result.rows as any[]
 
     return rows.map(row => ({
       ...row,
@@ -264,7 +283,8 @@ export class BlogDatabase {
   }
 
   // 根据标签获取文章
-  getPostsByTag(tag: string): Post[] {
+  async getPostsByTag(tag: string): Promise<Post[]> {
+    await this.initialized
     const query = `
       SELECT 
         p.*,
@@ -279,7 +299,11 @@ export class BlogDatabase {
       ORDER BY p.date DESC
     `
 
-    const rows = this.db.prepare(query).all(tag) as any[]
+    const result = await this.db.execute({
+      sql: query,
+      args: [tag]
+    })
+    const rows = result.rows as any[]
 
     return rows.map(row => ({
       ...row,
@@ -291,7 +315,8 @@ export class BlogDatabase {
   }
 
   // 更新文章
-  updatePost(id: number, postData: Partial<Omit<Post, 'id' | 'created_at' | 'updated_at'>>) {
+  async updatePost(id: number, postData: Partial<Omit<Post, 'id' | 'created_at' | 'updated_at'>>) {
+    await this.initialized
     // 验证数据
     const validatedData = PostSchema.partial().omit({ id: true, created_at: true, updated_at: true }).parse(postData)
 
@@ -326,10 +351,10 @@ export class BlogDatabase {
       updateValues.push(validatedData.category)
 
       // 插入分类（如果不存在）
-      const insertCategory = this.db.prepare(`
-        INSERT OR IGNORE INTO categories (name) VALUES (?)
-      `)
-      insertCategory.run(validatedData.category)
+      await this.db.execute({
+        sql: 'INSERT OR IGNORE INTO categories (name) VALUES (?)',
+        args: [validatedData.category]
+      })
     }
 
     if (validatedData.content !== undefined) {
@@ -358,62 +383,82 @@ export class BlogDatabase {
       return
 
     const query = `UPDATE posts SET ${updateFields.join(', ')} WHERE id = ?`
-    this.db.prepare(query).run(...updateValues)
+    await this.db.execute({
+      sql: query,
+      args: updateValues
+    })
 
     // 更新标签
     if (postData.tags !== undefined) {
       // 删除旧的标签关联
-      this.db.prepare('DELETE FROM post_tags WHERE post_id = ?').run(id)
+      await this.db.execute({
+        sql: 'DELETE FROM post_tags WHERE post_id = ?',
+        args: [id]
+      })
 
       // 添加新的标签关联
       if (postData.tags.length > 0) {
-        this.addTagsToPost(id, postData.tags)
+        await this.addTagsToPost(id, postData.tags)
       }
     }
   }
 
   // 删除文章
-  deletePost(id: number) {
-    this.db.prepare('DELETE FROM posts WHERE id = ?').run(id)
+  async deletePost(id: number) {
+    await this.initialized
+    await this.db.execute({
+      sql: 'DELETE FROM posts WHERE id = ?',
+      args: [id]
+    })
   }
 
   // 删除分类
-  deleteCategory(categoryName: string) {
+  async deleteCategory(categoryName: string) {
+    await this.initialized
     // 检查是否有文章使用该分类
-    const postsWithCategory = this.db.prepare('SELECT COUNT(*) as count FROM posts WHERE category = ?').get(categoryName) as { count: number }
+    const result = await this.db.execute({
+      sql: 'SELECT COUNT(*) as count FROM posts WHERE category = ?',
+      args: [categoryName]
+    })
+    const postsWithCategory = result.rows[0] as { count: number }
     
     if (postsWithCategory.count > 0) {
       throw new Error(`无法删除分类 "${categoryName}"，因为还有 ${postsWithCategory.count} 篇文章使用该分类`)
     }
 
     // 删除分类
-    const result = this.db.prepare('DELETE FROM categories WHERE name = ?').run(categoryName)
+    const deleteResult = await this.db.execute({
+      sql: 'DELETE FROM categories WHERE name = ?',
+      args: [categoryName]
+    })
     
-    if (result.changes === 0) {
+    if (deleteResult.rowsAffected === 0) {
       throw new Error(`分类 "${categoryName}" 不存在`)
     }
 
-    return result.changes
+    return deleteResult.rowsAffected
   }
 
   // 复制文章
-  copyPost(originalId: number, newSlug?: string): number {
+  async copyPost(originalId: number, newSlug?: string): Promise<number> {
+    await this.initialized
     // 获取原始文章
-    const originalPost = this.db.prepare(`
-      SELECT * FROM posts WHERE id = ?
-    `).get(originalId) as any
+    const result = await this.db.execute({
+      sql: 'SELECT * FROM posts WHERE id = ?',
+      args: [originalId]
+    })
+    const originalPost = result.rows[0] as any
 
     if (!originalPost) {
       throw new Error('原始文章不存在')
     }
 
     // 获取原始文章的标签
-    const originalTags = this.db.prepare(`
-      SELECT t.name 
-      FROM tags t 
-      INNER JOIN post_tags pt ON t.id = pt.tag_id 
-      WHERE pt.post_id = ?
-    `).all(originalId) as { name: string }[]
+    const tagsResult = await this.db.execute({
+      sql: 'SELECT t.name FROM tags t INNER JOIN post_tags pt ON t.id = pt.tag_id WHERE pt.post_id = ?',
+      args: [originalId]
+    })
+    const originalTags = tagsResult.rows as { name: string }[]
 
     const now = new Date().toISOString()
     
@@ -423,7 +468,7 @@ export class BlogDatabase {
     let counter = 1
 
     // 确保slug是唯一的
-    while (this.getPostBySlug(finalSlug)) {
+    while (await this.getPostBySlug(finalSlug)) {
       finalSlug = `${baseSlug}-${counter}`
       counter++
     }
@@ -442,13 +487,14 @@ export class BlogDatabase {
     }
 
     // 插入新文章
-    const newPostId = this.addPost(copyData)
+    const newPostId = await this.addPost(copyData)
     
     return newPostId
   }
 
   // 搜索文章（搜索标题、描述和内容）
-  searchPosts(query: string): Post[] {
+  async searchPosts(query: string): Promise<Post[]> {
+    await this.initialized
     if (!query.trim()) {
       return []
     }
@@ -484,10 +530,14 @@ export class BlogDatabase {
         p.date DESC
     `
 
-    const rows = this.db.prepare(searchQuery).all(
-      searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, // WHERE 条件
-      searchTerm, searchTerm, searchTerm // ORDER BY 条件
-    ) as any[]
+    const result = await this.db.execute({
+      sql: searchQuery,
+      args: [
+        searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, // WHERE 条件
+        searchTerm, searchTerm, searchTerm // ORDER BY 条件
+      ]
+    })
+    const rows = result.rows as any[]
 
     return rows.map(row => ({
       ...row,
@@ -500,7 +550,7 @@ export class BlogDatabase {
 
   // 关闭数据库连接
   close() {
-    this.db.close()
+    // Turso client 不需要手动关闭连接
   }
 }
 
@@ -509,7 +559,10 @@ let dbInstance: BlogDatabase | null = null
 
 export function getDatabase(): BlogDatabase {
   if (!dbInstance) {
-    dbInstance = new BlogDatabase()
+    dbInstance = new BlogDatabase(
+      process.env.TURSO_DATABASE_URL,
+      process.env.TURSO_AUTH_TOKEN
+    )
   }
   return dbInstance
 }

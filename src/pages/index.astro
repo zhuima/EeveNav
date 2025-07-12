@@ -7,18 +7,9 @@ import { ensureDatabaseData } from '../lib/migration'
 await ensureDatabaseData()
 
 const db = getDatabase()
-const posts = db.getPosts()
-const categories = db.getCategories()
-const tags = db.getTags()
-
-// 将 posts 按分类分组
-const postsByCategory = posts.reduce((acc, post) => {
-  if (!acc[post.category]) {
-    acc[post.category] = []
-  }
-  acc[post.category].push(post)
-  return acc
-}, {} as Record<string, typeof posts>)
+const posts = await db.getPosts()
+const categories = await db.getCategories()
+const tags = await db.getTags()
 ---
 
 <Layout title="EeveNav - 精选资源导航">
@@ -233,7 +224,6 @@ const postsByCategory = posts.reduce((acc, post) => {
   const resourceCards = document.querySelectorAll('.resource-card') as NodeListOf<HTMLElement>
   const filterBtns = document.querySelectorAll('.filter-btn') as NodeListOf<HTMLButtonElement>
   const noResults = document.getElementById('no-results') as HTMLElement
-  const hotSearchTags = document.querySelectorAll('[class*="rounded-full"]:not(.filter-btn)')
 
   let currentCategory = 'all'
 

@@ -21,7 +21,7 @@ const tags = [
 
 // 从数据库获取文章，而不是从内容集合
 const db = getDatabase()
-const allPosts = db.getPosts()
+const allPosts = await db.getPosts()
 
 // 转换数据库文章格式为与内容集合兼容的格式
 const formattedPosts = allPosts.map(post => ({

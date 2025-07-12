@@ -13,7 +13,7 @@ const currentPage = parseInt(pageParam.split('/').pop() || '1');
 const db = getDatabase();
 
 // 获取该分类下的所有文章
-const posts = db.getPostsByCategory(category || '');
+const posts = await db.getPostsByCategory(category || '');
 
 // 转换为与内容集合兼容的格式
 const formattedPosts = posts.map(post => ({

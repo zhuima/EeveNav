@@ -40,10 +40,10 @@ const props = Astro.props
   const sidebarSearchEmpty = document.getElementById('sidebar-search-empty');
   const sidebarSearchItems = document.getElementById('sidebar-search-items');
 
-  let searchTimeout;
+  let searchTimeout: NodeJS.Timeout | undefined;
 
   // 防抖搜索函数
-  function debouncedSearch(query) {
+  function debouncedSearch(query: string) {
     clearTimeout(searchTimeout);
     searchTimeout = setTimeout(() => {
       performSearch(query);
@@ -51,7 +51,7 @@ const props = Astro.props
   }
 
   // 执行搜索
-  async function performSearch(query) {
+  async function performSearch(query: string) {
     if (!query.trim()) {
       hideSidebarSearchResults();
       return;
@@ -95,10 +95,10 @@ const props = Astro.props
   }
 
   // 显示搜索结果
-  function displaySidebarSearchResults(posts) {
+  function displaySidebarSearchResults(posts: any[]) {
     if (!sidebarSearchItems) return;
 
-    const resultsHTML = posts.slice(0, 6).map(post => `
+    const resultsHTML = posts.slice(0, 6).map((post: any) => `
       <div class="px-4 py-3 hover:bg-gray-50 transition-colors cursor-pointer border-b border-gray-100 last:border-b-0" onclick="window.location.href='/posts/${post.slug}'">
         <div class="flex items-start space-x-3">
           <img src="${post.cover}" alt="${post.title}" class="w-10 h-10 object-cover rounded flex-shrink-0">
@@ -127,12 +127,13 @@ const props = Astro.props
   // 事件监听器
   if (sidebarSearchInput) {
     sidebarSearchInput.addEventListener('input', (e) => {
-      debouncedSearch(e.target.value);
+      const target = e.target as HTMLInputElement;
+      debouncedSearch(target.value);
     });
 
     // 焦点事件
     sidebarSearchInput.addEventListener('focus', () => {
-      if (sidebarSearchInput.value.trim()) {
+      if ((sidebarSearchInput as HTMLInputElement).value.trim()) {
         if (sidebarSearchResults) sidebarSearchResults.classList.remove('hidden');
       }
     });
@@ -148,7 +149,7 @@ const props = Astro.props
 
   // 点击外部隐藏结果
   document.addEventListener('click', (e) => {
-    if (sidebarSearchResults && !sidebarSearchResults.contains(e.target) && e.target !== sidebarSearchInput) {
+    if (sidebarSearchResults && !sidebarSearchResults.contains(e.target as Node) && e.target !== sidebarSearchInput) {
       hideSidebarSearchResults();
     }
   });

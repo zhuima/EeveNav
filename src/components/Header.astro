@@ -270,7 +270,7 @@ const navs = [
   }
   
   // 更新主题图标
-  function updateThemeIcons(isDark) {
+  function updateThemeIcons(isDark: boolean) {
     const icons = [themeToggle, mobileThemeToggle].filter(Boolean);
     icons.forEach(button => {
       if (button) {
@@ -353,7 +353,7 @@ const navs = [
     if (searchModal) {
       searchModal.classList.add('hidden');
       if (globalSearchInput) {
-        globalSearchInput.value = '';
+        (globalSearchInput as HTMLInputElement).value = '';
       }
       resetSearchResults();
     }
@@ -367,7 +367,7 @@ const navs = [
   }
 
   // 搜索资源
-  async function searchResources(query) {
+  async function searchResources(query: string) {
     if (!query.trim()) {
       resetSearchResults();
       return;
@@ -417,10 +417,10 @@ const navs = [
   }
 
   // 显示搜索结果
-  function displaySearchResults(posts) {
+  function displaySearchResults(posts: any[]) {
     if (!searchItems) return;
 
-    const resultsHTML = posts.slice(0, 8).map(post => `
+    const resultsHTML = posts.slice(0, 8).map((post: any) => `
       <div class="p-4 hover:bg-gray-50 rounded-xl transition-colors cursor-pointer" onclick="window.location.href='/posts/${post.slug}'">
         <div class="flex items-start space-x-3">
           <img src="${post.cover}" alt="${post.title}" class="w-12 h-12 object-cover rounded-lg flex-shrink-0">
@@ -440,9 +440,9 @@ const navs = [
   }
 
   // 防抖函数
-  function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
+  function debounce(func: (...args: any[]) => void, wait: number) {
+    let timeout: NodeJS.Timeout | undefined;
+    return function executedFunction(...args: any[]) {
       const later = () => {
         clearTimeout(timeout);
         func(...args);
@@ -468,7 +468,8 @@ const navs = [
   if (globalSearchInput) {
     const debouncedSearch = debounce(searchResources, 300);
     globalSearchInput.addEventListener('input', (e) => {
-      debouncedSearch(e.target.value);
+      const target = e.target as HTMLInputElement;
+      debouncedSearch(target.value);
     });
 
     // ESC键关闭模态框

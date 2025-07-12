@@ -1,6 +1,4 @@
 ---
-import Layout from '../layouts/Layout.astro'
-
 // 检查是否已经登录
 const cookies = Astro.cookies
 const isAuthenticated = cookies.get('admin_auth')?.value === 'authenticated'
@@ -282,7 +280,7 @@ if (Astro.request.method === 'POST') {
   <script>
     // 密码显示/隐藏切换
     const togglePassword = document.getElementById('toggle-password')
-    const passwordInput = document.getElementById('password')
+    const passwordInput = document.getElementById('password') as HTMLInputElement
     const eyeOpen = document.getElementById('eye-open')
     const eyeClosed = document.getElementById('eye-closed')
 
@@ -304,8 +302,8 @@ if (Astro.request.method === 'POST') {
     const form = document.querySelector('form')
     if (form) {
       form.addEventListener('submit', (e) => {
-        const username = document.getElementById('username').value.trim()
-        const password = document.getElementById('password').value.trim()
+        const username = (document.getElementById('username') as HTMLInputElement).value.trim()
+        const password = (document.getElementById('password') as HTMLInputElement).value.trim()
         
         if (!username || !password) {
           e.preventDefault()
@@ -319,7 +317,7 @@ if (Astro.request.method === 'POST') {
     const submitButton = form?.querySelector('button[type="submit"]')
     if (submitButton && form) {
       form.addEventListener('submit', () => {
-        submitButton.disabled = true
+        (submitButton as HTMLButtonElement).disabled = true
         submitButton.innerHTML = `
           <div class="flex items-center justify-center">
             <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

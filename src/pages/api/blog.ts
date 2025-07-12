@@ -1,6 +1,5 @@
 import type { APIRoute } from 'astro'
 import { getDatabase, PostSchema } from '../../lib/database'
-import { ensureDatabaseData } from '../../lib/migration'
 
 export const GET: APIRoute = async ({ url, request }) => {
   try {
@@ -20,7 +19,7 @@ export const GET: APIRoute = async ({ url, request }) => {
     // 如果有搜索参数，执行搜索
     if (searchQuery) {
       try {
-        const searchResults = db.searchPosts(searchQuery.trim())
+        const searchResults = await db.searchPosts(searchQuery.trim())
         console.log('Search results:', searchResults.length)
         return new Response(JSON.stringify({
           success: true,
@@ -65,7 +64,7 @@ export const GET: APIRoute = async ({ url, request }) => {
       case 'posts': {
         console.log('Getting posts...')
         try {
-          const posts = db.getPosts()
+          const posts = await db.getPosts()
           console.log('Posts found:', posts.length)
           return new Response(JSON.stringify(posts), {
             status: 200,
@@ -84,7 +83,7 @@ export const GET: APIRoute = async ({ url, request }) => {
       case 'categories': {
         console.log('Getting categories...')
         try {
-          const categories = db.getCategories()
+          const categories = await db.getCategories()
           console.log('Categories found:', categories.length)
           return new Response(JSON.stringify(categories), {
             status: 200,
@@ -102,7 +101,7 @@ export const GET: APIRoute = async ({ url, request }) => {
       case 'tags': {
         console.log('Getting tags...')
         try {
-          const tags = db.getTags()
+          const tags = await db.getTags()
           console.log('Tags found:', tags.length)
           return new Response(JSON.stringify(tags), {
             status: 200,
@@ -126,7 +125,7 @@ export const GET: APIRoute = async ({ url, request }) => {
           })
         }
 
-        const post = db.getPostBySlug(slug)
+        const post = await db.getPostBySlug(slug)
         if (!post) {
           return new Response(JSON.stringify({ error: '文章不存在' }), {
             status: 404,
@@ -166,11 +165,11 @@ export const GET: APIRoute = async ({ url, request }) => {
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    await ensureDatabaseData()
+    // await ensureDatabaseData() // 临时注释掉，避免重复数据插入
     const db = getDatabase()
     
     // 添加错误处理来捕获JSON解析错误
-    let body;
+    let body: any;
     try {
       body = await request.json();
     } catch (jsonError) {
@@ -273,7 +272,7 @@ export const POST: APIRoute = async ({ request }) => {
           const validatedData = PostSchema.omit({ id: true, created_at: true, updated_at: true }).parse(data)
 
           // 检查slug是否已存在
-          const existingPost = db.getPostBySlug(validatedData.slug)
+          const existingPost = await db.getPostBySlug(validatedData.slug)
           if (existingPost) {
             return new Response(JSON.stringify({ error: 'Slug已存在' }), {
               status: 409,
@@ -281,7 +280,7 @@ export const POST: APIRoute = async ({ request }) => {
             })
           }
 
-          const postId = db.addPost(validatedData)
+          const postId = await db.addPost(validatedData)
           return new Response(JSON.stringify({ id: postId, message: '文章添加成功' }), {
             status: 201,
             headers: { 'Content-Type': 'application/json' },
@@ -326,7 +325,7 @@ export const POST: APIRoute = async ({ request }) => {
           // 验证更新数据
           const validatedUpdateData = PostSchema.omit({ id: true, created_at: true, updated_at: true }).partial().parse(updateData)
 
-          db.updatePost(id, validatedUpdateData)
+          await db.updatePost(id, validatedUpdateData)
           return new Response(JSON.stringify({ message: '文章更新成功' }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
@@ -353,7 +352,7 @@ export const POST: APIRoute = async ({ request }) => {
           })
         }
 
-        db.deletePost(deleteId)
+        await db.deletePost(deleteId)
         return new Response(JSON.stringify({ message: '文章删除成功' }), {
           status: 200,
           headers: { 'Content-Type': 'application/json' },
@@ -370,7 +369,7 @@ export const POST: APIRoute = async ({ request }) => {
         }
 
         try {
-          db.deleteCategory(categoryName)
+          await db.deleteCategory(categoryName)
           return new Response(JSON.stringify({ message: '分类删除成功' }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
@@ -395,7 +394,7 @@ export const POST: APIRoute = async ({ request }) => {
         }
 
         try {
-          const newPostId = db.copyPost(postId, newSlug)
+          const newPostId = await db.copyPost(postId, newSlug)
           return new Response(JSON.stringify({ 
             id: newPostId, 
             message: '文章复制成功' 

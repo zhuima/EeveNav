@@ -3,27 +3,11 @@ import path from 'node:path'
 import { getCollection } from 'astro:content'
 import { getDatabase } from '../lib/database'
 
-// 添加external_url列到posts表
-export function migrateAddExternalUrlColumn() {
-  const db = getDatabase()
-  
-  try {
-    // 检查列是否存在
-    const checkColumnExists = db['db'].prepare(`
-      SELECT COUNT(*) as count FROM pragma_table_info('posts') WHERE name = 'external_url'
-    `).get() as { count: number }
-    
-    if (checkColumnExists.count === 0) {
-      console.log('添加external_url列到posts表...')
-      // 添加列
-      db['db'].exec(`ALTER TABLE posts ADD COLUMN external_url TEXT`)
-      console.log('external_url列添加成功')
-    } else {
-      console.log('external_url列已存在，跳过添加')
-    }
-  } catch (error) {
-    console.error('添加external_url列失败:', error)
-  }
+// 添加external_url列到posts表（Turso不需要手动迁移，表结构已在initTables中定义）
+export async function migrateAddExternalUrlColumn() {
+  // Turso数据库表结构在initTables中已经包含external_url列
+  // 无需额外迁移，跳过此步骤
+  console.log('Turso数据库external_url列已在表结构中定义，跳过迁移')
 }
 
 export async function migrateToDatabase() {
@@ -63,7 +47,7 @@ export async function migrateToDatabase() {
         }
 
         // 插入到数据库
-        const postId = db.addPost(postData)
+        const postId = await db.addPost(postData)
         console.log(`✓ 成功迁移文章: ${post.data.title} (ID: ${postId})`)
         successCount++
       }
@@ -78,9 +62,9 @@ export async function migrateToDatabase() {
     console.log(`失败: ${errorCount} 篇`)
 
     // 显示数据库统计信息
-    const allPosts = db.getPosts()
-    const categories = db.getCategories()
-    const tags = db.getTags()
+    const allPosts = await db.getPosts()
+    const categories = await db.getCategories()
+    const tags = await db.getTags()
 
     console.log(`\n数据库统计:`)
     console.log(`文章总数: ${allPosts.length}`)
@@ -93,14 +77,14 @@ export async function migrateToDatabase() {
 }
 
 // 检查数据库是否已初始化
-export function isDatabaseInitialized(): boolean {
+export async function isDatabaseInitialized(): Promise<boolean> {
   const db = getDatabase()
-  const posts = db.getPosts()
+  const posts = await db.getPosts()
   return posts.length > 0
 }
 
 // 创建示例数据
-function createSampleData() {
+async function createSampleData() {
   const db = getDatabase()
   
   const samplePosts = [
@@ -139,9 +123,9 @@ function createSampleData() {
   try {
     for (const postData of samplePosts) {
       // 检查是否已存在相同 slug 的文章
-      const existingPost = db.getPostBySlug(postData.slug)
+      const existingPost = await db.getPostBySlug(postData.slug)
       if (!existingPost) {
-        const postId = db.addPost(postData)
+        const postId = await db.addPost(postData)
         console.log(`✓ 创建示例文章: ${postData.title} (ID: ${postId})`)
       }
     }
@@ -153,20 +137,20 @@ function createSampleData() {
 // 同步检查函数：确保数据库有数据，如果没有则自动迁移
 export async function ensureDatabaseData() {
   try {
-    if (!isDatabaseInitialized()) {
+    if (!(await isDatabaseInitialized())) {
       console.log('数据库为空，尝试从内容文件迁移...')
       try {
         await migrateToDatabase()
       } catch (migrateError) {
         console.log('内容文件迁移失败，创建示例数据...')
-        createSampleData()
+        await createSampleData()
       }
     } else {
       console.log('数据库已有数据，跳过迁移')
     }
     
     // 确保external_url列存在
-    migrateAddExternalUrlColumn()
+    await migrateAddExternalUrlColumn()
   } catch (error) {
     console.error('确保数据库数据时出错:', error)
     // 即使出错也不抛出异常，允许API继续运行

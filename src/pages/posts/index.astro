@@ -6,7 +6,7 @@ import { getDatabase } from '../../lib/database'
 
 // 从数据库获取所有文章
 const db = getDatabase()
-const allPosts = db.getPosts()
+const allPosts = await db.getPosts()
 
 // 转换数据库文章格式为与内容集合兼容的格式
 const formattedPosts = allPosts.map(post => ({
