@@ -22,10 +22,12 @@ const tags = [
 // 从数据库获取文章，而不是从内容集合
 const db = getDatabase()
 const allPosts = await db.getPosts()
+// 只获取没有external_url的自写博客文章
+const blogPosts = allPosts.filter(post => !post.external_url || post.external_url.trim() === '')
 const categories = await db.getCategories()
 
 // 转换数据库文章格式为与内容集合兼容的格式
-const formattedPosts = allPosts.map(post => ({
+const formattedPosts = blogPosts.map(post => ({
   slug: post.slug,
   data: {
     title: post.title,

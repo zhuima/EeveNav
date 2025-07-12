@@ -7,14 +7,16 @@ import { ensureDatabaseData } from '../lib/migration'
 await ensureDatabaseData()
 
 const db = getDatabase()
-const posts = await db.getPosts()
+const allPosts = await db.getPosts()
+// 只获取有external_url的第三方站点
+const posts = allPosts.filter(post => post.external_url && post.external_url.trim() !== '')
 const categories = await db.getCategories()
 const tags = await db.getTags()
 
 // SEO配置
 const seoConfig = {
   title: 'EeveNav - 精选资源导航 | 发现优质工具、教程与灵感',
-  description: `精心整理的${posts.length}+优质资源，涵盖${categories.length}个分类。包含开发工具、设计资源、学习教程、AI工具等。让每一次搜索都有价值，助力您的创意与开发工作。`,
+  description: `精心整理的${posts.length}+优质第三方资源，涵盖${categories.length}个分类。包含开发工具、设计资源、学习教程、AI工具等。让每一次搜索都有价值，助力您的创意与开发工作。`,
   keywords: [
     '资源导航', '开发工具', '设计资源', '学习教程', '创意灵感', 
     'AI工具', '免费图标', '编程学习', '前端开发', '设计工具',
@@ -30,7 +32,7 @@ const seoConfig = {
   <main class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
     <!-- Hero Section - 搜索为中心 -->
     <section class="w-full px-6 pt-16 pb-12">
-      <div class="max-w-5xl mx-auto text-center">
+      <div class="max-w-7xl mx-auto text-center">
         <!-- 主标题 -->
         <header class="mb-8">
           <h1 class="text-6xl md:text-7xl font-bold tracking-tight mb-4">
@@ -111,7 +113,7 @@ const seoConfig = {
 
     <!-- 分类过滤器 -->
     <section class="w-full px-6 mb-12" aria-label="资源分类过滤器">
-      <div class="max-w-6xl mx-auto">
+      <div class="max-w-7xl mx-auto">
         <h2 class="sr-only">按分类筛选资源</h2>
         <div class="flex flex-wrap justify-center gap-3 mb-12" role="group" aria-label="分类筛选按钮">
           <button 
