@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config'
 import UnoCSS from 'unocss/astro'
 import node from '@astrojs/node'
+import { loadEnv } from 'vite'
 
 // https://astro.build/config
 export default defineConfig({
@@ -13,4 +14,10 @@ export default defineConfig({
       injectReset: true,
     }),
   ],
+  vite: {
+    define: {
+      'process.env.TURSO_DATABASE_URL': JSON.stringify(process.env.TURSO_DATABASE_URL),
+      'process.env.TURSO_AUTH_TOKEN': JSON.stringify(process.env.TURSO_AUTH_TOKEN),
+    }
+  }
 })

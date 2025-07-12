@@ -24,9 +24,13 @@ export class BlogDatabase {
   private initialized: Promise<void>
 
   constructor(url?: string, authToken?: string) {
+    // 优先使用传入的参数，然后是环境变量，最后是hardcoded fallback
+    const dbUrl = url || process.env.TURSO_DATABASE_URL
+    const dbToken = authToken || process.env.TURSO_AUTH_TOKEN
+    
     this.db = createClient({
-      url: url || process.env.TURSO_DATABASE_URL || 'file:blog.db',
-      authToken: authToken || process.env.TURSO_AUTH_TOKEN,
+      url: dbUrl,
+      authToken: dbToken,
     })
     this.initialized = this.initTables()
   }
