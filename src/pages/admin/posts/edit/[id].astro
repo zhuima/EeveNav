@@ -269,8 +269,13 @@ if (error) {
   async function loadCategories() {
     try {
       const response = await fetch('/api/blog?action=categories');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
       const data = await response.json();
       const categorySelect = document.getElementById('category');
+      
+      console.log('分类数据:', data); // 调试日志
       
       if (data.success && data.categories) {
         data.categories.forEach((category) => {
@@ -282,9 +287,13 @@ if (error) {
           }
           categorySelect.appendChild(option);
         });
+      } else {
+        console.error('分类数据格式错误:', data);
+        showNotification('加载分类失败', 'error');
       }
     } catch (error) {
       console.error('加载分类失败:', error);
+      showNotification('加载分类失败: ' + error.message, 'error');
     }
   }
 
@@ -299,13 +308,31 @@ if (error) {
       title: formData.get('title'),
       slug: formData.get('slug'),
       content: formData.get('content'),
-      description: formData.get('description'),
+      des: formData.get('description'), // 注意：表单字段是description，数据库字段是des
       category: formData.get('category'),
       tags: tagsValue.split(',').map((tag) => tag.trim()).filter((tag) => tag),
-      cover: formData.get('cover'),
-      external_url: formData.get('external_url'),
+      cover: formData.get('cover') || '', // 确保空值变为空字符串
+      external_url: formData.get('external_url') || '', // 确保空值变为空字符串
       status: isDraft ? 'draft' : 'published'
     };
+
+    console.log('提交的文章数据:', postData); // 调试日志
+
+    // 基本验证
+    if (!postData.title || !postData.title.trim()) {
+      showNotification('请输入文章标题', 'error');
+      return;
+    }
+    
+    if (!postData.category || !postData.category.trim()) {
+      showNotification('请选择文章分类', 'error');
+      return;
+    }
+    
+    if (!postData.content || !postData.content.trim()) {
+      showNotification('请输入文章内容', 'error');
+      return;
+    }
 
     try {
       const response = await fetch('/api/blog', {
@@ -319,7 +346,16 @@ if (error) {
         })
       });
 
+      console.log('API响应状态:', response.status); // 调试日志
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API错误响应:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+
       const result = await response.json();
+      console.log('API响应结果:', result); // 调试日志
       
       if (result.success) {
         // 显示成功消息
@@ -329,11 +365,11 @@ if (error) {
           window.location.href = '/admin/posts';
         }, 1500);
       } else {
-        showNotification(result.message || '更新失败', 'error');
+        showNotification(result.error || result.message || '更新失败', 'error');
       }
     } catch (error) {
       console.error('更新失败:', error);
-      showNotification('网络错误，请重试', 'error');
+      showNotification('网络错误，请重试: ' + error.message, 'error');
     }
   }
 

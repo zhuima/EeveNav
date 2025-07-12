@@ -272,6 +272,17 @@ export const POST: APIRoute = async ({ request }) => {
                 headers: { 'Content-Type': 'application/json' },
               });
             }
+          } else {
+            // 如果没有提供日期，使用当前时间
+            data.date = new Date();
+          }
+
+          // 处理可选的URL字段，空字符串转为null
+          if (data.cover === '') {
+            data.cover = null;
+          }
+          if (data.external_url === '') {
+            data.external_url = null;
           }
           
           // 验证数据
@@ -296,7 +307,7 @@ export const POST: APIRoute = async ({ request }) => {
           return new Response(JSON.stringify({ 
             error: '数据验证失败', 
             details: validationError instanceof Error ? validationError.message : '未知验证错误',
-            help: '确保日期字段是有效的日期格式，如 ISO 格式 (YYYY-MM-DD 或 YYYY-MM-DDTHH:MM:SS.sssZ)'
+            help: '确保所有必填字段都已填写且格式正确'
           }), {
             status: 400,
             headers: { 'Content-Type': 'application/json' },
@@ -317,22 +328,32 @@ export const POST: APIRoute = async ({ request }) => {
         }
 
         try {
-          // 处理日期字段 - 如果是字符串，转换为 Date 对象
-          if (updateData.date && typeof updateData.date === 'string') {
-            updateData.date = new Date(updateData.date);
-            if (isNaN(updateData.date.getTime())) {
-              return new Response(JSON.stringify({ 
-                success: false,
-                error: '日期格式无效',
-                details: '请提供有效的日期格式，如 ISO 格式 (YYYY-MM-DD 或 YYYY-MM-DDTHH:MM:SS.sssZ)'
-              }), {
-                status: 400,
-                headers: { 'Content-Type': 'application/json' },
-              });
+          // 处理日期字段 - 如果是字符串，转换为 Date 对象，如果没有则不更新日期
+          if (updateData.date) {
+            if (typeof updateData.date === 'string') {
+              updateData.date = new Date(updateData.date);
+              if (isNaN(updateData.date.getTime())) {
+                return new Response(JSON.stringify({ 
+                  success: false,
+                  error: '日期格式无效',
+                  details: '请提供有效的日期格式，如 ISO 格式 (YYYY-MM-DD 或 YYYY-MM-DDTHH:MM:SS.sssZ)'
+                }), {
+                  status: 400,
+                  headers: { 'Content-Type': 'application/json' },
+                });
+              }
             }
           }
 
-          // 验证更新数据
+          // 处理可选的URL字段，空字符串转为null
+          if (updateData.cover === '') {
+            updateData.cover = null;
+          }
+          if (updateData.external_url === '') {
+            updateData.external_url = null;
+          }
+
+          // 验证更新数据 - 只验证提供的字段
           const validatedUpdateData = PostSchema.omit({ id: true, created_at: true, updated_at: true }).partial().parse(updateData)
 
           await db.updatePost(id, validatedUpdateData)
@@ -349,7 +370,7 @@ export const POST: APIRoute = async ({ request }) => {
             success: false,
             error: '数据验证失败', 
             details: validationError instanceof Error ? validationError.message : '未知验证错误',
-            help: '确保日期字段是有效的日期格式，如 ISO 格式 (YYYY-MM-DD 或 YYYY-MM-DDTHH:MM:SS.sssZ)'
+            help: '确保所有必填字段都已填写且格式正确'
           }), {
             status: 400,
             headers: { 'Content-Type': 'application/json' },

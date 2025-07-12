@@ -261,11 +261,11 @@ console.log('代码块');
       title: formData.get('title'),
       slug: formData.get('slug'),
       content: formData.get('content'),
-      description: formData.get('description'),
+      des: formData.get('description'), // 注意：表单字段是description，数据库字段是des
       category: formData.get('category'),
-      tags: tagsValue.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag),
-      cover: formData.get('cover'),
-      external_url: formData.get('external_url'),
+      tags: tagsValue.split(',').map((tag) => tag.trim()).filter((tag) => tag),
+      cover: formData.get('cover') || '', // 确保空值变为空字符串
+      external_url: formData.get('external_url') || '', // 确保空值变为空字符串
       status: isDraft ? 'draft' : 'published'
     };
 

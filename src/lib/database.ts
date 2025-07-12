@@ -6,13 +6,13 @@ export const PostSchema = z.object({
   id: z.number().int().positive().optional(),
   title: z.string().min(1, '标题不能为空').max(200, '标题过长'),
   date: z.date(),
-  des: z.string().min(1, '描述不能为空').max(500, '描述过长'),
-  cover: z.string().url('封面必须是有效的URL'),
+  des: z.string().max(500, '描述过长').default(''), // 允许为空
+  cover: z.string().url('封面必须是有效的URL').or(z.literal('')).default(''), // 允许为空字符串
   category: z.string().min(1, '分类不能为空').max(100, '分类名称过长').default('unsorted'),
   tags: z.array(z.string().min(1, '标签不能为空').max(50, '标签名称过长')).default([]),
   content: z.string().min(1, '内容不能为空'),
   slug: z.string().min(1, 'slug不能为空').max(200, 'slug过长'),
-  external_url: z.string().url('外部链接必须是有效的URL').optional(),
+  external_url: z.string().url('外部链接必须是有效的URL').optional().or(z.literal('')), // 完全可选，允许空字符串
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
 })
