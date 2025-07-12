@@ -22,6 +22,18 @@ if (post.external_url) {
 // 获取相关文章（同分类或同标签）
 const relatedPosts = await db.getRelatedPosts(post.id, 4);
 
+// 引入marked并解析markdown内容
+import { marked } from 'marked';
+
+// 配置marked选项
+marked.setOptions({
+  breaks: true,
+  gfm: true,
+});
+
+// 解析markdown内容为HTML
+const htmlContent = marked.parse(post.content);
+
 // SEO配置
 const seoConfig = {
   title: `${post.title} - EeveNav`,
@@ -165,7 +177,7 @@ const seoConfig = {
 
           <!-- 文章内容 -->
           <div class="content prose prose-lg max-w-none" itemprop="articleBody">
-            <div set:html={post.content} />
+            <div set:html={htmlContent} />
           </div>
 
           <!-- 文章底部操作 -->

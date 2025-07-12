@@ -224,6 +224,38 @@ export class BlogDatabase {
     }
   }
 
+  // 根据ID获取文章
+  async getPostById(id: number): Promise<Post | null> {
+    await this.initialized
+    const query = `
+      SELECT 
+        p.*,
+        GROUP_CONCAT(t.name) as tags
+      FROM posts p
+      LEFT JOIN post_tags pt ON p.id = pt.post_id
+      LEFT JOIN tags t ON pt.tag_id = t.id
+      WHERE p.id = ?
+      GROUP BY p.id
+    `
+
+    const result = await this.db.execute({
+      sql: query,
+      args: [id]
+    })
+    const row = result.rows[0] as any
+
+    if (!row)
+      return null
+
+    return {
+      ...row,
+      date: new Date(row.date),
+      created_at: new Date(row.created_at),
+      updated_at: new Date(row.updated_at),
+      tags: row.tags ? row.tags.split(',') : [],
+    }
+  }
+
   // 获取分类和文章数量
   async getCategories(): Promise<{ name: string, count: number }[]> {
     await this.initialized

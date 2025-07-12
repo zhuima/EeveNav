@@ -55,13 +55,21 @@ const navigationItems = [
   <title>{title} - EeveNav 管理后台</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    // @ts-ignore
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {}
+    // 等待 Tailwind 加载完成后配置
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof tailwind !== 'undefined') {
+        tailwind.config = {
+          darkMode: 'class',
+          theme: {
+            extend: {
+              fontFamily: {
+                sans: ['ui-sans-serif', 'system-ui', 'sans-serif']
+              }
+            }
+          }
         }
-    }
+      }
+    });
   </script>
   <style>
     /* 自定义滚动条 */

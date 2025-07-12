@@ -1,0 +1,506 @@
+---
+import AdminLayout from '@/layouts/AdminLayout.astro'
+import { getDatabase } from '@/lib/database'
+
+// 检查用户是否已登录
+const cookies = Astro.cookies
+const isAuthenticated = cookies.get('admin_auth')?.value === 'authenticated'
+
+// 如果未登录，重定向到登录页面
+if (!isAuthenticated) {
+  return Astro.redirect('/login')
+}
+
+// 获取文章ID
+const { id } = Astro.params;
+const postId = Number(id);
+
+// 获取文章数据
+const db = getDatabase();
+let post = null;
+let error = null;
+
+try {
+  post = await db.getPostById(postId);
+  if (!post) {
+    error = '文章不存在';
+  }
+} catch (e) {
+  error = '获取文章数据失败';
+  console.error('Error fetching post:', e);
+}
+
+// 如果有错误，显示错误页面
+if (error) {
+  return new Response(`
+    <html>
+      <head><title>错误 - EeveNav</title></head>
+      <body>
+        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif;">
+          <div style="text-align: center;">
+            <h1>错误</h1>
+            <p>${error}</p>
+            <a href="/admin/posts" style="color: blue;">返回文章列表</a>
+          </div>
+        </div>
+      </body>
+    </html>
+  `, {
+    status: 404,
+    headers: { 'Content-Type': 'text/html' }
+  });
+}
+---
+
+<AdminLayout title="编辑文章" activeSection="posts">
+  <div class="min-h-screen bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <!-- 页面头部 -->
+      <div class="mb-6 flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">编辑文章</h1>
+          <p class="text-gray-600 mt-1">编辑现有文章内容</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <a href="/admin/posts" 
+             class="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+            取消
+          </a>
+          <button id="save-draft-btn" 
+                  class="px-4 py-2 text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors">
+            保存草稿
+          </button>
+          <button id="update-btn" 
+                  class="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-sm">
+            更新文章
+          </button>
+        </div>
+      </div>
+
+      <form id="post-form" class="space-y-6">
+        <!-- 基本信息 -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">基本信息</h2>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- 标题 -->
+            <div class="lg:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">文章标题 *</label>
+              <input type="text" 
+                     id="title" 
+                     name="title" 
+                     required
+                     value={post.title}
+                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                     placeholder="请输入文章标题">
+            </div>
+            
+            <!-- 别名 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">文章别名 (URL)</label>
+              <input type="text" 
+                     id="slug" 
+                     name="slug"
+                     value={post.slug}
+                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                     placeholder="自动生成或手动输入">
+              <p class="mt-1 text-xs text-gray-500">用于URL，如果为空将自动生成</p>
+            </div>
+
+            <!-- 分类 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">分类 *</label>
+              <select id="category" 
+                      name="category" 
+                      required
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                <option value="">请选择分类</option>
+              </select>
+            </div>
+
+            <!-- 摘要 -->
+            <div class="lg:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">文章摘要</label>
+              <textarea id="description" 
+                        name="description" 
+                        rows="3"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+                        placeholder="简要描述文章内容，用于SEO和列表展示">{post.des}</textarea>
+            </div>
+
+            <!-- 标签 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">标签</label>
+              <input type="text" 
+                     id="tags" 
+                     name="tags"
+                     value={Array.isArray(post.tags) ? post.tags.join(', ') : ''}
+                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                     placeholder="用逗号分隔多个标签">
+              <p class="mt-1 text-xs text-gray-500">例如：JavaScript, React, 前端开发</p>
+            </div>
+
+            <!-- 封面图 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">封面图片</label>
+              <input type="url" 
+                     id="cover" 
+                     name="cover"
+                     value={post.cover}
+                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                     placeholder="图片URL地址">
+            </div>
+
+            <!-- 外部链接 -->
+            <div class="lg:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">外部链接</label>
+              <input type="url" 
+                     id="external_url" 
+                     name="external_url"
+                     value={post.external_url || ''}
+                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                     placeholder="如果是外部资源，可以添加链接">
+              <p class="mt-1 text-xs text-gray-500">用户点击文章时会跳转到此链接</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Markdown 编辑器 -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h2 class="text-lg font-semibold text-gray-900">文章内容</h2>
+            <div class="flex items-center gap-3">
+              <button type="button" 
+                      id="preview-toggle" 
+                      class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors">
+                <span id="preview-text">显示预览</span>
+              </button>
+              <div class="text-sm text-gray-500">
+                支持 <a href="https://www.markdownguide.org/basic-syntax/" target="_blank" class="text-blue-600 hover:underline">Markdown 语法</a>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex h-96">
+            <!-- 编辑器 -->
+            <div id="editor-pane" class="flex-1 flex flex-col">
+              <div class="flex-1 relative">
+                <textarea id="content" 
+                          name="content" 
+                          class="w-full h-full p-6 border-0 resize-none focus:ring-0 focus:outline-none font-mono text-sm leading-relaxed"
+                          placeholder="# 开始编辑...">{post.content}</textarea>
+              </div>
+            </div>
+
+            <!-- 预览区域 -->
+            <div id="preview-pane" class="hidden flex-1 border-l border-gray-200">
+              <div class="flex-1 p-6 overflow-y-auto bg-gray-50">
+                <div id="preview-content" class="prose prose-sm max-w-none">
+                  <p class="text-gray-500 italic">预览内容将在这里显示...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</AdminLayout>
+
+<!-- 引入 marked.js 用于 Markdown 解析 -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script define:vars={{ post, postId }}>
+  // Markdown 预览功能
+  const contentTextarea = document.getElementById('content');
+  const previewContent = document.getElementById('preview-content');
+  const previewToggle = document.getElementById('preview-toggle');
+  const previewText = document.getElementById('preview-text');
+  const previewPane = document.getElementById('preview-pane');
+  
+  let isPreviewVisible = false;
+
+  // 切换预览显示
+  previewToggle?.addEventListener('click', () => {
+    isPreviewVisible = !isPreviewVisible;
+    
+    if (isPreviewVisible) {
+      previewPane?.classList.remove('hidden');
+      if (previewText) previewText.textContent = '隐藏预览';
+      updatePreview();
+    } else {
+      previewPane?.classList.add('hidden');
+      if (previewText) previewText.textContent = '显示预览';
+    }
+  });
+
+  // 实时更新预览
+  function updatePreview() {
+    if (isPreviewVisible && previewContent) {
+      const markdownText = contentTextarea.value;
+      if (markdownText.trim()) {
+        previewContent.innerHTML = window.marked.parse(markdownText);
+      } else {
+        previewContent.innerHTML = '<p class="text-gray-500 italic">预览内容将在这里显示...</p>';
+      }
+    }
+  }
+
+  // 监听内容变化
+  contentTextarea.addEventListener('input', updatePreview);
+
+  // 自动生成别名
+  const titleInput = document.getElementById('title');
+  const slugInput = document.getElementById('slug');
+  
+  titleInput.addEventListener('input', () => {
+    if (!slugInput.value) {
+      // 简单的别名生成：移除特殊字符，用连字符连接
+      const slug = titleInput.value
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-+|-+$/g, ''); // 移除开头和结尾的连字符
+      slugInput.value = slug;
+    }
+  });
+
+  // 加载分类数据
+  async function loadCategories() {
+    try {
+      const response = await fetch('/api/blog?action=categories');
+      const data = await response.json();
+      const categorySelect = document.getElementById('category');
+      
+      if (data.success && data.categories) {
+        data.categories.forEach((category) => {
+          const option = document.createElement('option');
+          option.value = category.name;
+          option.textContent = category.name;
+          if (category.name === post.category) {
+            option.selected = true;
+          }
+          categorySelect.appendChild(option);
+        });
+      }
+    } catch (error) {
+      console.error('加载分类失败:', error);
+    }
+  }
+
+  // 更新文章
+  async function updatePost(isDraft = false) {
+    const form = document.getElementById('post-form');
+    const formData = new FormData(form);
+    const tagsValue = formData.get('tags') || '';
+    
+    const postData = {
+      id: postId,
+      title: formData.get('title'),
+      slug: formData.get('slug'),
+      content: formData.get('content'),
+      description: formData.get('description'),
+      category: formData.get('category'),
+      tags: tagsValue.split(',').map((tag) => tag.trim()).filter((tag) => tag),
+      cover: formData.get('cover'),
+      external_url: formData.get('external_url'),
+      status: isDraft ? 'draft' : 'published'
+    };
+
+    try {
+      const response = await fetch('/api/blog', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          action: 'update', 
+          data: postData
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        // 显示成功消息
+        showNotification(isDraft ? '草稿保存成功！' : '文章更新成功！', 'success');
+        // 延迟跳转
+        setTimeout(() => {
+          window.location.href = '/admin/posts';
+        }, 1500);
+      } else {
+        showNotification(result.message || '更新失败', 'error');
+      }
+    } catch (error) {
+      console.error('更新失败:', error);
+      showNotification('网络错误，请重试', 'error');
+    }
+  }
+
+  // 通知函数
+  function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 ${
+      type === 'success' ? 'bg-green-600 text-white' :
+      type === 'error' ? 'bg-red-600 text-white' :
+      'bg-blue-600 text-white'
+    }`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.remove();
+    }, 3000);
+  }
+
+  // 绑定保存按钮事件
+  document.getElementById('save-draft-btn')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    updatePost(true);
+  });
+
+  document.getElementById('update-btn')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    updatePost(false);
+  });
+
+  // 初始化
+  document.addEventListener('DOMContentLoaded', () => {
+    loadCategories();
+  });
+
+  // 键盘快捷键
+  document.addEventListener('keydown', (e) => {
+    // Ctrl/Cmd + S 保存草稿
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+      updatePost(true);
+    }
+    // Ctrl/Cmd + Enter 更新
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      updatePost(false);
+    }
+  });
+</script>
+
+<style>
+  /* Markdown 编辑器样式 */
+  #content {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    line-height: 1.6;
+  }
+
+  /* 预览区域样式 */
+  .prose {
+    color: #374151;
+  }
+
+  .prose h1 {
+    font-size: 2em;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 1em;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 0.5em;
+  }
+
+  .prose h2 {
+    font-size: 1.5em;
+    font-weight: 600;
+    margin-top: 2em;
+    margin-bottom: 1em;
+  }
+
+  .prose h3 {
+    font-size: 1.25em;
+    font-weight: 600;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+
+  .prose p {
+    margin-bottom: 1em;
+    line-height: 1.7;
+  }
+
+  .prose code {
+    background-color: #f3f4f6;
+    padding: 0.2em 0.4em;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  }
+
+  .prose pre {
+    background-color: #1f2937;
+    color: #f9fafb;
+    padding: 1em;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 1em 0;
+  }
+
+  .prose pre code {
+    background-color: transparent;
+    padding: 0;
+    color: inherit;
+  }
+
+  .prose blockquote {
+    border-left: 4px solid #3b82f6;
+    padding-left: 1em;
+    margin: 1.5em 0;
+    font-style: italic;
+    color: #6b7280;
+  }
+
+  .prose ul, .prose ol {
+    margin: 1em 0;
+    padding-left: 2em;
+  }
+
+  .prose li {
+    margin: 0.5em 0;
+  }
+
+  .prose a {
+    color: #3b82f6;
+    text-decoration: underline;
+  }
+
+  .prose a:hover {
+    text-decoration: none;
+  }
+
+  .prose hr {
+    border: none;
+    border-top: 2px solid #e5e7eb;
+    margin: 2em 0;
+  }
+
+  .prose img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1em 0;
+  }
+
+  .prose table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+  }
+
+  .prose th, .prose td {
+    border: 1px solid #e5e7eb;
+    padding: 0.5em 1em;
+    text-align: left;
+  }
+
+  .prose th {
+    background-color: #f9fafb;
+    font-weight: 600;
+  }
+</style>
