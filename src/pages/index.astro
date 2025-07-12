@@ -31,8 +31,8 @@ const seoConfig = {
 <Layout {...seoConfig}>
   <main class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
     <!-- Hero Section - 搜索为中心 -->
-    <section class="w-full px-6 pt-16 pb-12">
-      <div class="max-w-7xl mx-auto text-center">
+    <section class="w-full pt-16 pb-12">
+      <div class="max-w-7xl mx-auto px-6 lg:px-8 text-center">
         <!-- 主标题 -->
         <header class="mb-8">
           <h1 class="text-6xl md:text-7xl font-bold tracking-tight mb-4">
@@ -112,8 +112,8 @@ const seoConfig = {
     </section>
 
     <!-- 分类过滤器 -->
-    <section class="w-full px-6 mb-12" aria-label="资源分类过滤器">
-      <div class="max-w-7xl mx-auto">
+    <section class="w-full mb-12" aria-label="资源分类过滤器">
+      <div class="max-w-7xl mx-auto px-6 lg:px-8">
         <h2 class="sr-only">按分类筛选资源</h2>
         <div class="flex flex-wrap justify-center gap-3 mb-12" role="group" aria-label="分类筛选按钮">
           <button 
@@ -140,8 +140,8 @@ const seoConfig = {
     </section>
 
     <!-- 资源卡片网格 -->
-    <section class="w-full px-6 pb-20" aria-label="资源列表">
-      <div class="max-w-7xl mx-auto">
+    <section class="w-full pb-20" aria-label="资源列表">
+      <div class="max-w-7xl mx-auto px-6 lg:px-8">
         <h2 class="sr-only">精选资源列表</h2>
         <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {posts.map(post => (
