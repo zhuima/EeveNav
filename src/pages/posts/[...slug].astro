@@ -22,17 +22,13 @@ if (post.external_url) {
 // 获取相关文章（同分类或同标签）
 const relatedPosts = await db.getRelatedPosts(post.id, 4);
 
-// 引入marked并解析markdown内容
-import { marked } from 'marked';
-
-// 配置marked选项
-marked.setOptions({
-  breaks: true,
-  gfm: true,
-});
+// 引入增强的markdown解析器
+import { parseMarkdown, initializeCharts } from '@/utils/markdown';
+// 导入样式
+import '@/assets/markdown.css';
 
 // 解析markdown内容为HTML
-const htmlContent = marked.parse(post.content);
+const htmlContent = await parseMarkdown(post.content);
 
 // SEO配置
 const seoConfig = {
@@ -326,6 +322,9 @@ const seoConfig = {
     });
   });
 </script>
+
+<!-- 图表和代码增强脚本 -->
+<Fragment set:html={initializeCharts()} />
 
 <style is:global>
 body {
