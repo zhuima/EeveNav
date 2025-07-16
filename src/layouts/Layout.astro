@@ -35,7 +35,7 @@ const seoProps = Astro.props;
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       // Tailwind配置
-      tailwind.config = {
+      (window as any).tailwind.config = {
         darkMode: 'class',
         theme: {
           extend: {

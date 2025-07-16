@@ -57,8 +57,8 @@ const navigationItems = [
   <script>
     // 等待 Tailwind 加载完成后配置
     document.addEventListener('DOMContentLoaded', function() {
-      if (typeof tailwind !== 'undefined') {
-        tailwind.config = {
+      if (typeof (window as any).tailwind !== 'undefined') {
+        (window as any).tailwind.config = {
           darkMode: 'class',
           theme: {
             extend: {

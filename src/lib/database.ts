@@ -12,7 +12,7 @@ export const PostSchema = z.object({
   tags: z.array(z.string().min(1, '标签不能为空').max(50, '标签名称过长')).default([]),
   content: z.string().min(1, '内容不能为空'),
   slug: z.string().min(1, 'slug不能为空').max(200, 'slug过长'),
-  external_url: z.string().url('外部链接必须是有效的URL').optional().or(z.literal('')), // 完全可选，允许空字符串
+  external_url: z.string().url('外部链接必须是有效的URL').optional().or(z.literal('')).nullable(), // 完全可选，允许空字符串和null
   created_at: z.date().optional(),
   updated_at: z.date().optional(),
 })
