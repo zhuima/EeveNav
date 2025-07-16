@@ -5,9 +5,7 @@ import vercel from '@astrojs/vercel/serverless'
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
-  adapter: vercel({
-    runtime: 'nodejs18.x'
-  }),
+  adapter: vercel(),
   integrations: [
     UnoCSS({
       injectReset: true,
