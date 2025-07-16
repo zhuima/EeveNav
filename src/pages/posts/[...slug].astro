@@ -32,13 +32,13 @@ const htmlContent = await parseMarkdown(post.content);
 
 // SEO配置
 const seoConfig = {
-  title: `${post.title} - EeveNav`,
+  title: `${post.title} - AffDirs`,
   description: post.des || `探索${post.title}的详细内容。${post.category}分类下的精选资源，包含实用技巧和深度分析。`,
   keywords: [
     ...post.tags,
     post.category,
     '技术文章',
-    'EeveNav',
+    'AffDirs',
     '资源推荐',
     '开发工具',
     '设计资源'
@@ -46,7 +46,7 @@ const seoConfig = {
   type: 'article' as const,
   image: post.cover || '/og-article.jpg',
   imageAlt: `${post.title}的封面图`,
-  author: 'EeveNav Team',
+  author: 'AffDirs Team',
   publishDate: post.date,
   modifiedDate: post.updated_at || post.date,
   category: post.category,
@@ -125,7 +125,7 @@ const seoConfig = {
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                 </svg>
-                <span itemprop="name">EeveNav Team</span>
+                <span itemprop="name">AffDirs Team</span>
               </div>
 
               <!-- 发布日期 -->

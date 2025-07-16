@@ -89,14 +89,14 @@ async function createSampleData() {
   
   const samplePosts = [
     {
-      title: "欢迎使用 EeveNav",
+      title: "欢迎使用 AffDirs",
       date: new Date('2024-01-01'),
-      des: "这是一个示例文章，演示如何使用 EeveNav 导航系统",
+      des: "这是一个示例文章，演示如何使用 AffDirs 导航系统",
       cover: "https://picsum.photos/800/400?random=1",
       category: "教程",
       tags: ["导航", "示例", "教程"],
-      content: "# 欢迎使用 EeveNav\n\n这是一个功能强大的导航系统，帮助您轻松管理和分享优质资源。\n\n## 主要特性\n\n- 🔍 智能搜索功能\n- 📂 分类管理\n- 🏷️ 标签系统\n- 📱 响应式设计\n- 🎨 美观的界面\n\n## 如何使用\n\n1. 浏览资源\n2. 使用搜索功能\n3. 通过分类和标签筛选\n4. 点击链接访问资源\n\n祝您使用愉快！",
-      slug: "welcome-to-eevenav"
+      content: "# 欢迎使用 AffDirs\n\n这是一个功能强大的导航系统，帮助您轻松管理和分享优质资源。\n\n## 主要特性\n\n- 🔍 智能搜索功能\n- 📂 分类管理\n- 🏷️ 标签系统\n- 📱 响应式设计\n- 🎨 美观的界面\n\n## 如何使用\n\n1. 浏览资源\n2. 使用搜索功能\n3. 通过分类和标签筛选\n4. 点击链接访问资源\n\n祝您使用愉快！",
+      slug: "welcome-to-AffDirs"
     },
     {
       title: "React 学习资源汇总",

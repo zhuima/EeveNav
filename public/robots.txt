@@ -14,7 +14,7 @@ Allow: /api/blog
 Allow: /api/test-filter
 
 # 网站地图
-Sitemap: https://eevenav.com/sitemap.xml
+Sitemap: https://AffDirs.com/sitemap.xml
 
 # 爬取延迟（可选，对友好爬虫的建议）
 Crawl-delay: 1

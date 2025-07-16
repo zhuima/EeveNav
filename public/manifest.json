@@ -1,6 +1,6 @@
 {
-  "name": "EeveNav - 精选资源导航",
-  "short_name": "EeveNav",
+  "name": "AffDirs - 精选资源导航",
+  "short_name": "AffDirs",
   "description": "精心整理的工具、文章、教程和灵感合集，让每一次搜索都有价值",
   "start_url": "/",
   "display": "standalone",

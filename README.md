@@ -1,8 +1,8 @@
-# EeveNav 🧭
+# AffDirs 🧭
 
 > 精选资源导航 - 一个现代化的资源收藏与分享平台
 
-EeveNav 是一个基于 Astro 框架构建的现代化资源导航网站，专为收藏、管理和分享优质网络资源而设计。它提供了直观的用户界面、强大的搜索功能和完整的内容管理系统。
+AffDirs 是一个基于 Astro 框架构建的现代化资源导航网站，专为收藏、管理和分享优质网络资源而设计。它提供了直观的用户界面、强大的搜索功能和完整的内容管理系统。
 
 ## ✨ 特性
 
@@ -50,7 +50,7 @@ EeveNav 是一个基于 Astro 框架构建的现代化资源导航网站，专�
 ```bash
 # 克隆项目
 git clone <your-repo-url>
-cd EeveNav
+cd AffDirs
 
 # 安装依赖
 npm install
@@ -98,7 +98,7 @@ npm run preview
 ## 📁 项目结构
 
 ```
-EeveNav/
+AffDirs/
 ├── src/
 │   ├── components/          # 可复用组件
 │   │   ├── Header.astro    # 网站头部（含搜索）
