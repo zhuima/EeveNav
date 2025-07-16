@@ -32,20 +32,7 @@ const seoProps = Astro.props;
     <SEOHead {...seoProps} />
     
     <!-- 样式 -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      // Tailwind配置
-      (window as any).tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            fontFamily: {
-              'sans': ['system-ui', 'sans-serif'],
-            }
-          }
-        }
-      }
-    </script>
+    <!-- UnoCSS已在项目中配置，无需额外引入 -->
     
     <!-- 性能优化 -->
     <style>
