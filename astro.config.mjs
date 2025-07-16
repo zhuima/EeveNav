@@ -1,12 +1,12 @@
 import { defineConfig } from 'astro/config'
 import UnoCSS from 'unocss/astro'
-import node from '@astrojs/node'
+import vercel from '@astrojs/vercel/serverless'
 
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
-  adapter: node({
-    mode: 'standalone'
+  adapter: vercel({
+    runtime: 'nodejs18.x'
   }),
   integrations: [
     UnoCSS({

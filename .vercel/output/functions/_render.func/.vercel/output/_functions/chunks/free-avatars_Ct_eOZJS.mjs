@@ -1,0 +1,28 @@
+import { c as createComponent, m as maybeRenderHead, u as unescapeHTML, e as renderTemplate } from './astro/server_zWkKcK-x.mjs';
+import 'kleur/colors';
+import 'clsx';
+
+const html = "<p>网址: <a href=\"https://alohe.github.io/avatars/\">https://alohe.github.io/avatars/</a></p>\n<p>该网站的主要特点和功能：</p>\n<p>Avatars 是一个来自网络各处的多样化免费头像图片集合，旨在为您的项目增添个性。通过提供大量生动的插图，您可以在几秒钟内提升您的项目效果。</p>";
+
+				const frontmatter = {"title":"开源头像生成工具网站","des":"该工具允许用户轻松创建自定义的卡通风格头像","date":"2024-10-02T00:00:00.000Z","cover":"https://pub-7cd46562d86a460881359b6ed3de331e.r2.dev/CleanShot%202024-10-02%20at%2016.00.20%402x.png","tags":["设计资源","工具资源"],"category":"设计资源"};
+				const file = "/home/zhuima/github/javascript/EeveNav/src/content/blog/free-avatars.md";
+				const url = undefined;
+				function rawContent() {
+					return "\n网址: [https://alohe.github.io/avatars/](https://alohe.github.io/avatars/)\n\n该网站的主要特点和功能：\n\nAvatars 是一个来自网络各处的多样化免费头像图片集合，旨在为您的项目增添个性。通过提供大量生动的插图，您可以在几秒钟内提升您的项目效果。\n";
+				}
+				function compiledContent() {
+					return html;
+				}
+				function getHeadings() {
+					return [];
+				}
+
+				const Content = createComponent((result, _props, slots) => {
+					const { layout, ...content } = frontmatter;
+					content.file = file;
+					content.url = url;
+
+					return renderTemplate`${maybeRenderHead()}${unescapeHTML(html)}`;
+				});
+
+export { Content, compiledContent, Content as default, file, frontmatter, getHeadings, rawContent, url };

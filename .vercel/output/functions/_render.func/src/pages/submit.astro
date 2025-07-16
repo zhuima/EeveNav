@@ -1,0 +1,415 @@
+---
+import Layout from '../layouts/Layout.astro'
+
+// SEO配置
+const seoConfig = {
+  title: '收录申请 - EeveNav | 提交优质资源站点',
+  description: '向EeveNav提交您发现的优质第三方资源站点。我们致力于收录高质量的工具、教程、设计资源等，帮助更多人发现有价值的内容。',
+  keywords: [
+    '资源收录', '站点提交', '第三方资源', '工具推荐', '网站收录',
+    'EeveNav收录', '资源申请', '站点申请', '优质资源', '资源导航'
+  ],
+  type: 'website' as const,
+  image: '/og-submit.jpg',
+  imageAlt: 'EeveNav资源收录申请 - 提交优质第三方站点'
+}
+---
+
+<Layout {...seoConfig}>
+  <main class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
+    <div class="max-w-4xl mx-auto px-6 py-16">
+      <!-- 页面头部 -->
+      <header class="text-center mb-12">
+        <div class="mb-6">
+          <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+          </div>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">
+          <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            资源收录申请
+          </span>
+        </h1>
+        <p class="text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
+          发现了优质的第三方资源？与我们分享，让更多人受益！
+          <br>
+          <span class="text-gray-500">我们会仔细审核每一个提交的资源</span>
+        </p>
+      </header>
+
+      <!-- 提交须知 -->
+      <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+        <h2 class="text-lg font-semibold text-blue-900 mb-3 flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          提交须知
+        </h2>
+        <ul class="text-blue-800 space-y-1 text-sm">
+          <li>• 请确保提交的资源具有实用价值，内容质量高</li>
+          <li>• 资源应该是公开可访问的，无需特殊权限</li>
+          <li>• 我们优先收录免费或有免费版本的资源</li>
+          <li>• 请提供准确的描述和适当的分类标签</li>
+          <li>• 审核通过后，资源将出现在首页</li>
+        </ul>
+      </div>
+
+      <!-- 提交表单 -->
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+        <div class="px-8 py-6 border-b border-gray-200 bg-gray-50">
+          <h3 class="text-xl font-semibold text-gray-900">资源信息</h3>
+          <p class="text-gray-600 mt-1">请填写完整的资源信息，方便我们快速审核</p>
+        </div>
+
+        <form id="submit-form" class="p-8 space-y-6">
+          <!-- 基本信息 -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- 资源名称 -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                资源名称 <span class="text-red-500">*</span>
+              </label>
+              <input type="text" 
+                     id="title" 
+                     name="title" 
+                     required
+                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                     placeholder="例如：Figma - 协作设计工具">
+            </div>
+
+            <!-- 资源链接 -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                资源链接
+              </label>
+              <input type="url" 
+                     id="external_url" 
+                     name="external_url" 
+                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                     placeholder="https://example.com">
+              <p class="mt-1 text-xs text-gray-500">请提供完整的URL地址，包含 https://（可选）</p>
+            </div>
+
+            <!-- 分类 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                分类 <span class="text-red-500">*</span>
+              </label>
+              <select id="category" 
+                      name="category" 
+                      required
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                <option value="">请选择分类</option>
+              </select>
+            </div>
+
+            <!-- 封面图片 -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">封面图片</label>
+              <input type="url" 
+                     id="cover" 
+                     name="cover"
+                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                     placeholder="https://example.com/image.jpg">
+              <p class="mt-1 text-xs text-gray-500">可选，建议提供高质量的预览图</p>
+            </div>
+
+            <!-- 资源描述 -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                资源描述 <span class="text-red-500">*</span>
+              </label>
+              <textarea id="description" 
+                        name="description" 
+                        rows="4"
+                        required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+                        placeholder="简要描述这个资源的功能和特点，以及为什么值得推荐..."></textarea>
+            </div>
+
+            <!-- 标签 -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">标签</label>
+              <input type="text" 
+                     id="tags" 
+                     name="tags"
+                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                     placeholder="设计工具, 免费, 在线工具">
+              <p class="mt-1 text-xs text-gray-500">用逗号分隔多个标签，有助于用户搜索发现</p>
+            </div>
+          </div>
+
+          <!-- 联系信息 -->
+          <div class="border-t border-gray-200 pt-6">
+            <h4 class="text-lg font-medium text-gray-900 mb-4">联系信息（可选）</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">您的昵称</label>
+                <input type="text" 
+                       id="submitter_name" 
+                       name="submitter_name"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                       placeholder="可留空或填写昵称">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">联系邮箱</label>
+                <input type="email" 
+                       id="submitter_email" 
+                       name="submitter_email"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                       placeholder="可选，用于审核结果通知">
+              </div>
+            </div>
+          </div>
+
+          <!-- 提交按钮 -->
+          <div class="border-t border-gray-200 pt-6">
+            <div class="flex items-center justify-between">
+              <p class="text-sm text-gray-500">
+                提交即表示您同意我们的审核标准，我们将在3个工作日内处理您的申请
+              </p>
+              <div class="flex gap-3">
+                <a href="/" 
+                   class="px-6 py-3 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                  取消
+                </a>
+                <button type="submit" 
+                        id="submit-btn"
+                        class="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed">
+                  提交申请
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- 常见问题 -->
+      <div class="mt-16">
+        <h2 class="text-2xl font-bold text-gray-900 mb-8 text-center">常见问题</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <h3 class="font-semibold text-gray-900 mb-2">审核需要多长时间？</h3>
+            <p class="text-gray-600 text-sm">通常在3个工作日内完成审核。高质量的资源会优先处理。</p>
+          </div>
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <h3 class="font-semibold text-gray-900 mb-2">什么样的资源会被收录？</h3>
+            <p class="text-gray-600 text-sm">我们偏好免费、实用、高质量的资源，特别是对开发者和设计师有帮助的工具。</p>
+          </div>
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <h3 class="font-semibold text-gray-900 mb-2">如何提高通过率？</h3>
+            <p class="text-gray-600 text-sm">提供详细的描述、准确的分类、高质量的封面图，确保资源确实有价值。</p>
+          </div>
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <h3 class="font-semibold text-gray-900 mb-2">可以提交自己的网站吗？</h3>
+            <p class="text-gray-600 text-sm">可以，但我们会以同样的标准进行审核，确保资源质量和实用性。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  // 加载分类数据
+  async function loadCategories() {
+    try {
+      const response = await fetch('/api/blog?action=categories');
+      const data = await response.json();
+      const categorySelect = document.getElementById('category');
+      
+      if (data.success && data.categories) {
+        data.categories.forEach((category: any) => {
+          const option = document.createElement('option');
+          option.value = category.name;
+          option.textContent = category.name;
+          categorySelect.appendChild(option);
+        });
+      }
+    } catch (error) {
+      console.error('加载分类失败:', error);
+    }
+  }
+
+  // 提交表单
+  async function submitResource(event: Event) {
+    event.preventDefault();
+    
+    const form = document.getElementById('submit-form') as HTMLFormElement;
+    const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+    const formData = new FormData(form);
+    
+    // 禁用提交按钮
+    submitBtn.disabled = true;
+    submitBtn.textContent = '提交中...';
+    
+    const tagsValue = formData.get('tags') as string || '';
+    
+    const resourceData = {
+      title: formData.get('title'),
+      external_url: formData.get('external_url'),
+      des: formData.get('description'),
+      category: formData.get('category'),
+      tags: tagsValue.split(',').map((tag) => tag.trim()).filter((tag) => tag),
+      cover: formData.get('cover') || '',
+      content: `# ${formData.get('title')}\n\n${formData.get('description')}\n\n[访问资源](${formData.get('external_url')})`,
+      slug: generateSlug(formData.get('title') as string),
+      // 添加提交者信息到内容中
+      submitter_name: formData.get('submitter_name'),
+      submitter_email: formData.get('submitter_email')
+    };
+
+    try {
+      const response = await fetch('/api/blog', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          action: 'add', 
+          data: {
+            ...resourceData,
+            date: new Date().toISOString()
+          }
+        })
+      });
+
+      const result = await response.json();
+      
+      if (response.ok && (result.id || result.message)) {
+        // 显示成功消息
+        showNotification('提交成功！我们会在3个工作日内审核您的申请。', 'success');
+        // 重置表单
+        form.reset();
+        // 延迟跳转到首页
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 2000);
+      } else {
+        showNotification(result.error || '提交失败，请重试', 'error');
+      }
+    } catch (error) {
+      console.error('提交失败:', error);
+      showNotification('网络错误，请检查网络连接后重试', 'error');
+    } finally {
+      // 恢复提交按钮
+      submitBtn.disabled = false;
+      submitBtn.textContent = '提交申请';
+    }
+  }
+
+  // 生成slug
+  function generateSlug(title: string): string {
+    return title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '') + '-' + Date.now();
+  }
+
+  // 通知函数
+  function showNotification(message: string, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transition-all duration-300 transform ${
+      type === 'success' ? 'bg-green-600 text-white' :
+      type === 'error' ? 'bg-red-600 text-white' :
+      'bg-blue-600 text-white'
+    }`;
+    notification.style.transform = 'translateX(100%)';
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // 动画进入
+    setTimeout(() => {
+      notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // 3秒后移除
+    setTimeout(() => {
+      notification.style.transform = 'translateX(100%)';
+      setTimeout(() => {
+        notification.remove();
+      }, 300);
+    }, 3000);
+  }
+
+  // 表单验证
+  function validateForm() {
+    const title = (document.getElementById('title') as HTMLInputElement).value.trim();
+    const external_url = (document.getElementById('external_url') as HTMLInputElement).value.trim();
+    const category = (document.getElementById('category') as HTMLSelectElement).value;
+    const description = (document.getElementById('description') as HTMLTextAreaElement).value.trim();
+    
+    if (!title || !external_url || !category || !description) {
+      showNotification('请填写所有必填字段', 'error');
+      return false;
+    }
+    
+    // 验证URL格式
+    try {
+      new URL(external_url);
+    } catch (e) {
+      showNotification('请输入有效的URL地址', 'error');
+      return false;
+    }
+    
+    return true;
+  }
+
+  // 绑定事件
+  document.getElementById('submit-form')?.addEventListener('submit', (e) => {
+    if (validateForm()) {
+      submitResource(e);
+    } else {
+      e.preventDefault();
+    }
+  });
+
+  // 初始化
+  document.addEventListener('DOMContentLoaded', () => {
+    loadCategories();
+  });
+
+  // 实时URL验证
+  const urlInput = document.getElementById('external_url') as HTMLInputElement;
+  urlInput?.addEventListener('blur', () => {
+    const url = urlInput.value.trim();
+    if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+      urlInput.value = 'https://' + url;
+    }
+  });
+</script>
+
+<style>
+  /* 表单样式增强 */
+  .form-group:focus-within label {
+    color: #059669;
+  }
+  
+  /* 动画效果 */
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  .notification-enter {
+    animation: slideInRight 0.3s ease-out;
+  }
+  
+  /* 响应式调整 */
+  @media (max-width: 768px) {
+    .md\\:col-span-2 {
+      grid-column: span 1;
+    }
+  }
+</style>

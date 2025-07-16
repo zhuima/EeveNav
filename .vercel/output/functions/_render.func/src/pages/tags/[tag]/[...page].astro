@@ -1,0 +1,70 @@
+---
+import PostList from '@/components/post/PostList.astro'
+import Layout from '@/layouts/Layout.astro'
+import PostLayout from '@/layouts/PostLayout.astro'
+import { getDatabase } from '../../../lib/database'
+
+// 获取URL参数
+const { tag } = Astro.params;
+const pageParam = Astro.params.page || '1';
+const currentPage = parseInt(pageParam.split('/').pop() || '1');
+
+// 获取数据库实例
+const db = getDatabase();
+
+// 获取包含此标签的所有文章
+const posts = await db.getPostsByTag(tag || '');
+
+// 转换为与内容集合兼容的格式
+const formattedPosts = posts.map(post => ({
+  slug: post.slug,
+  data: {
+    title: post.title,
+    date: post.date,
+    des: post.des,
+    cover: post.cover,
+    category: post.category,
+    tags: post.tags,
+  }
+}));
+
+// 按日期排序
+const sortedPosts = formattedPosts.sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime()
+);
+
+// 手动分页
+const postsPerPage = 20;
+const totalPosts = sortedPosts.length;
+const totalPages = Math.ceil(totalPosts / postsPerPage);
+const start = (currentPage - 1) * postsPerPage;
+const end = start + postsPerPage;
+const paginatedPosts = sortedPosts.slice(start, end);
+
+// 创建分页对象
+const page = {
+  data: paginatedPosts,
+  start,
+  end: Math.min(end, totalPosts),
+  size: postsPerPage,
+  total: totalPosts,
+  currentPage,
+  lastPage: totalPages,
+  url: {
+    current: `/tags/${tag}/${currentPage}`,
+    prev: currentPage > 1 ? `/tags/${tag}/${currentPage - 1}` : null,
+    next: currentPage < totalPages ? `/tags/${tag}/${currentPage + 1}` : null,
+    first: `/tags/${tag}/1`,
+    last: `/tags/${tag}/${totalPages}`,
+  },
+};
+---
+
+<Layout title={`标签: ${tag}`}>
+  <div class="">
+    <h1 class="text-3xl font-bold my-8 text-center">标签: {tag}</h1>
+    <PostLayout>
+        <PostList page={page} />
+      </PostLayout>
+  </div>
+</Layout>
