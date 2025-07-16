@@ -25,9 +25,13 @@ export class BlogDatabase {
 
   constructor(url?: string, authToken?: string) {
     // 优先使用传入的参数，然后是环境变量，最后是hardcoded fallback
-    const dbUrl = url || process.env.TURSO_DATABASE_URL || 'libsql://jinju-zhuima.aws-ap-northeast-1.turso.io'
-    const dbToken = authToken || process.env.TURSO_AUTH_TOKEN || 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NTIyOTM0MjQsImlkIjoiOWZiNDEwMDktMjA4Mi00YTc1LWJkYzMtYWRlYWNkOTU5Nzk5IiwicmlkIjoiNGY3OTE3M2UtMWRjNC00NDBiLTkyMDgtZTA0OTVjNTE3NjZhIn0.oM4IIZbb6ut1ss_mfY0AtjR4q_8-3zsnxv6MwbqeonAp2qvA8eatYWMgxVLBafyNkCwr5ND4J110pV6qe_ybDg'
+    const dbUrl = url || import.meta.env.PUBLIC_TURSO_DATABASE_URL || process.env.PUBLIC_TURSO_DATABASE_URL
+    const dbToken = authToken || import.meta.env.PUBLIC_TURSO_AUTH_TOKEN || process.env.PUBLIC_TURSO_AUTH_TOKEN
     
+    if (!dbUrl) {
+      throw new Error('Database URL is not defined. Please set PUBLIC_TURSO_DATABASE_URL environment variable.')
+    }
+
     this.db = createClient({
       url: dbUrl,
       authToken: dbToken,
@@ -708,8 +712,8 @@ let dbInstance: BlogDatabase | null = null
 export function getDatabase(): BlogDatabase {
   if (!dbInstance) {
     dbInstance = new BlogDatabase(
-      process.env.TURSO_DATABASE_URL,
-      process.env.TURSO_AUTH_TOKEN
+      import.meta.env.PUBLIC_TURSO_DATABASE_URL || process.env.PUBLIC_TURSO_DATABASE_URL,
+      import.meta.env.PUBLIC_TURSO_AUTH_TOKEN || process.env.PUBLIC_TURSO_AUTH_TOKEN
     )
   }
   return dbInstance
