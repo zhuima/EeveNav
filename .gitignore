@@ -30,3 +30,7 @@ pnpm-debug.log*
 
 blog.db
 blog.db.backup
+
+
+# vercel
+.vercel/

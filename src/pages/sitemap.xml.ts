@@ -9,7 +9,7 @@ export const GET: APIRoute = async () => {
   const tags = await db.getTags();
 
   // 获取站点信息
-  const siteUrl = 'https://AffDirs.com'; // 请替换为实际域名
+  const siteUrl = 'https://affdirs.com'; // 请替换为实际域名
   const currentDate = new Date().toISOString();
 
   // 静态页面
