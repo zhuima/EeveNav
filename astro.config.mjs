@@ -6,7 +6,7 @@ import vercel from '@astrojs/vercel/serverless'
 export default defineConfig({
   output: 'server',
   adapter: vercel({
-    nodeVersion: '22'
+    nodeVersion: '18'
   }),
   integrations: [
     UnoCSS({
