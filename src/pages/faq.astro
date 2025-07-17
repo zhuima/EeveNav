@@ -1,0 +1,148 @@
+---
+import Layout from '../layouts/Layout.astro';
+import FAQAccordion from '../components/FAQAccordion.astro';
+
+// SEO配置
+const seoConfig = {
+  title: '常见问题 - AffDirs 精选资源导航',
+  description: '了解如何更好地使用AffDirs发现和管理优质资源。包含搜索技巧、资源筛选、分类理解等详细指南。',
+  keywords: [
+    '常见问题', 'FAQ', '使用指南', '搜索技巧', '资源导航',
+    'AffDirs帮助', '工具推荐', '教程指南', '用户支持'
+  ],
+  type: 'website' as const,
+  image: '/og-faq.jpg',
+  imageAlt: 'AffDirs常见问题 - 使用指南和帮助中心'
+};
+---
+
+<Layout {...seoConfig}>
+  <!-- 页面头部 -->
+  <section class="w-full bg-gradient-to-b from-gray-50 to-white py-20">
+    <div class="max-w-4xl mx-auto px-6 lg:px-8 text-center">
+      <h1 class="text-5xl md:text-6xl font-bold tracking-tight mb-6">
+        <span class="bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+          常见问题
+        </span>
+      </h1>
+      <p class="text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto mb-8">
+        我们整理了用户最常遇到的问题，帮助你更好地使用AffDirs发现和管理优质资源
+      </p>
+      
+      <!-- 快速导航按钮 -->
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="#faq-list" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl">
+          查看问题列表
+        </a>
+        <a href="/submit" class="inline-flex items-center px-6 py-3 bg-gray-200 text-gray-700 rounded-full font-medium hover:bg-gray-300 transition-colors">
+          提交问题
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 主要内容区域 -->
+  <section id="faq-list" class="w-full py-16">
+    <div class="max-w-4xl mx-auto px-6 lg:px-8">
+      <FAQAccordion />
+    </div>
+  </section>
+
+  <!-- 额外支持区域 -->
+  <section class="w-full bg-gray-50 py-16">
+    <div class="max-w-4xl mx-auto px-6 lg:px-8">
+      <div class="grid md:grid-cols-3 gap-8">        
+        <!-- 联系支持 -->
+        <div class="text-center p-6 bg-white rounded-2xl shadow-sm">
+          <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">邮件支持</h3>
+          <p class="text-gray-600 text-sm mb-4">有任何问题，随时联系我们获得帮助</p>
+          <a href="mailto:help@affdirs.com" class="text-blue-600 hover:text-blue-700 font-medium">
+            help@affdirs.com
+          </a>
+        </div>
+
+        <!-- 社区支持 -->
+        <div class="text-center p-6 bg-white rounded-2xl shadow-sm">
+          <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">社区讨论</h3>
+          <p class="text-gray-600 text-sm mb-4">加入社区，与其他用户交流经验</p>
+          <a href="https://github.com/zhuima/community" class="text-purple-600 hover:text-purple-700 font-medium"
+             rel="noopener noreferrer">
+            加入讨论
+          </a>
+        </div>
+
+        <!-- 资源提交 -->
+        <div class="text-center p-6 bg-white rounded-2xl shadow-sm">
+          <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-900 mb-2">提交资源</h3>
+          <p class="text-gray-600 text-sm mb-4">发现好工具？分享给更多用户</p>
+          <a href="/submit" class="text-green-600 hover:text-green-700 font-medium">
+            立即提交
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 结构化数据 -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "AffDirs是如何筛选和收录优质资源的？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "我们采用多维度评估体系：实用性评估、质量评估、社区反馈、更新维护、免费价值等五个维度进行全面评估。"
+        }
+      },
+      {
+        "@type": "Question", 
+        "name": "如何高效使用搜索功能找到所需资源？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "提供精准搜索、模糊搜索、标签筛选、分类浏览、快捷键操作等多种搜索策略，支持中英文双语搜索。"
+        }
+      }
+    ]
+  })} />
+
+</Layout>
+
+<style>
+  /* 平滑滚动 */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* 动画效果 */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-fadeInUp {
+    animation: fadeInUp 0.6s ease-out;
+  }
+</style>

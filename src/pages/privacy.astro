@@ -1,0 +1,374 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// SEO配置 - 深度优化隐私政策
+const seoConfig = {
+  title: '隐私政策 - AffDirs 精选资源导航平台',
+  description: '了解AffDirs如何收集、使用、存储和保护您的个人信息。透明的隐私政策，确保您的数据安全和隐私权利得到充分保护。',
+  keywords: [
+    '隐私政策', '个人信息保护', '数据安全', '隐私权', 'Cookie政策',
+    '数据收集', '信息使用', '用户隐私', 'GDPR合规', '隐私保护',
+    'AffDirs隐私', '数据存储', '第三方共享', '用户权利'
+  ],
+  type: 'website' as const,
+  image: '/og-privacy.jpg',
+  imageAlt: 'AffDirs隐私政策 - 个人信息保护和数据安全'
+};
+
+// 结构化数据
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "隐私政策",
+  "description": "AffDirs精选资源导航平台的隐私政策和个人信息保护声明",
+  "url": "https://affdirs.com/privacy",
+  "publisher": {
+    "@type": "Organization",
+    "name": "AffDirs",
+    "url": "https://affdirs.com"
+  },
+  "datePublished": "2024-01-01",
+  "dateModified": new Date().toISOString().split('T')[0]
+};
+
+// 隐私政策内容
+const sections = [
+  {
+    title: "引言与概述",
+    id: "introduction",
+    content: [
+      "AffDirs（'我们'、'我们的'或'本服务'）高度重视用户的隐私和个人信息保护。",
+      "本隐私政策详细说明了我们如何收集、使用、存储和保护您的个人信息，以及您享有的相关权利。",
+      "使用我们的服务即表示您同意本隐私政策的条款。如果您不同意本政策的任何部分，请勿使用我们的服务。"
+    ]
+  },
+  {
+    title: "信息收集类型",
+    id: "information-collection",
+    content: [
+      "**主动提供的信息**：当用户提交资源、联系客服或订阅服务时，可能会主动提供姓名、邮箱地址等信息。",
+      "**自动收集的信息**：",
+      "- 设备信息：浏览器类型、设备类型、操作系统、屏幕分辨率",
+      "- 使用数据：访问时间、页面浏览记录、搜索关键词、点击行为",
+      "- 位置信息：大致地理位置（城市/省份级别）",
+      "- Cookie和类似技术：用于改善用户体验和网站功能"
+    ]
+  },
+  {
+    title: "信息使用目的",
+    id: "information-usage",
+    content: [
+      "**服务提供与改进**：",
+      "- 提供和维护我们的服务",
+      "- 改进和优化网站功能和用户体验",
+      "- 开发新功能和服务",
+      "**个性化体验**：",
+      "- 根据用户偏好推荐相关资源",
+      "- 提供个性化的内容和搜索体验",
+      "**沟通与服务**：",
+      "- 回复用户咨询和反馈",
+      "- 发送重要通知和服务更新",
+      "**安全与合规**：",
+      "- 检测和防止欺诈、滥用行为",
+      "- 确保平台安全和数据完整性",
+      "- 遵守法律法规要求"
+    ]
+  },
+  {
+    title: "信息共享与披露",
+    id: "information-sharing",
+    content: [
+      "**我们不会出售您的个人信息**，也绝不会将个人信息用于商业目的出售给第三方。",
+      "**信息共享情况**：",
+      "- **服务提供商**：与帮助我们运营网站的技术服务提供商共享必要信息，这些提供商受保密协议约束",
+      "- **法律要求**：在法律要求或法院命令下，我们可能会披露相关信息",
+      "- **权利保护**：为保护我们或他人的权利、财产或安全，在必要时披露信息",
+      "- **用户同意**：经用户明确同意后与第三方共享信息"
+    ]
+  },
+  {
+    title: "Cookie政策",
+    id: "cookie-policy",
+    content: [
+      "**Cookie类型**：",
+      "- **基本Cookie**：确保网站基本功能正常运行",
+      "- **分析Cookie**：帮助我们了解用户如何使用网站，以便改进服务",
+      "- **偏好Cookie**：记住用户的设置和偏好",
+      "**Cookie管理**：",
+      "- 用户可以通过浏览器设置管理或删除Cookie",
+      "- 禁用Cookie可能会影响某些网站功能的正常使用",
+      "- 我们不会使用Cookie收集个人身份信息"
+    ]
+  },
+  {
+    title: "数据存储与安全",
+    id: "data-security",
+    content: [
+      "**数据存储位置**：",
+      "- 用户数据存储在中国境内的安全服务器上",
+      "- 采用业界标准的安全措施保护数据",
+      "**安全措施**：",
+      "- 使用HTTPS加密传输所有数据",
+      "- 定期备份数据防止丢失",
+      "- 实施访问控制，仅授权人员可访问用户数据",
+      "- 定期进行安全审计和漏洞扫描",
+      "**数据保留期限**：",
+      "- 用户主动提供的个人信息：保留至用户请求删除或服务终止后合理期限",
+      "- 自动收集的使用数据：保留用于分析目的，定期清理过期数据"
+    ]
+  },
+  {
+    title: "用户权利",
+    id: "user-rights",
+    content: [
+      "**访问权**：用户有权请求访问我们持有的关于其的个人信息。",
+      "**更正权**：用户有权要求更正不准确的个人信息。",
+      "**删除权**：用户有权要求删除其个人信息（法律要求保留的除外）。",
+      "**限制处理权**：用户有权限制对其个人信息的处理。",
+      "**数据可携带权**：用户有权以结构化、常用格式获取其个人信息。",
+      "**撤回同意权**：用户有权随时撤回对个人信息处理的同意。",
+      "**投诉权**：用户有权向相关数据保护机构投诉。"
+    ]
+  },
+  {
+    title: "第三方链接",
+    id: "third-party-links",
+    content: [
+      "我们的服务可能包含指向第三方网站或服务的链接。",
+      "我们对第三方网站的隐私政策或内容不承担任何责任。",
+      "建议用户在访问第三方网站时仔细阅读其隐私政策。",
+      "包含第三方链接不代表我们对该网站的认可或保证。"
+    ]
+  },
+  {
+    title: "儿童隐私",
+    id: "children-privacy",
+    content: [
+      "我们的服务不面向14岁以下儿童。",
+      "我们不会故意收集14岁以下儿童的个人信息。",
+      "如发现收集了14岁以下儿童的个人信息，我们将立即删除相关信息。",
+      "家长或监护人如发现儿童向我们提供了个人信息，请立即联系我们删除。"
+    ]
+  },
+  {
+    title: "隐私政策变更",
+    id: "policy-changes",
+    content: [
+      "我们可能会不时更新本隐私政策。",
+      "任何重大变更都将通过网站公告或电子邮件通知用户。",
+      "变更生效后继续使用服务即表示接受更新后的隐私政策。",
+      "建议用户定期查看本页面以了解最新隐私政策。"
+    ]
+  },
+  {
+    title: "联系我们",
+    id: "contact",
+    content: [
+      "如果您对本隐私政策有任何疑问、担忧或投诉，请通过以下方式联系我们：",
+      "**隐私官联系邮箱**：privacy@affdirs.com",
+      "**一般咨询邮箱**：help@affdirs.com",
+      "**邮寄地址**：香港",
+      "**响应时间**：我们将在收到您的请求后15个工作日内回复。"
+    ]
+  }
+];
+
+const lastUpdated = new Date().toLocaleDateString('zh-CN', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+---
+
+<Layout {...seoConfig}>
+  <!-- 页面头部 -->
+  <section class="w-full bg-gradient-to-b from-gray-50 to-white py-20">
+    <div class="max-w-4xl mx-auto px-6 lg:px-8 text-center">
+      <h1 class="text-5xl md:text-6xl font-bold tracking-tight mb-6">
+        <span class="bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+          隐私政策
+        </span>
+      </h1>
+      <p class="text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto mb-4">
+        我们致力于保护您的个人信息安全和隐私权利
+      </p>
+      <p class="text-sm text-gray-500">
+        最后更新日期：{lastUpdated}
+      </p>
+    </div>
+  </section>
+
+  <!-- 主要内容 -->
+  <section class="w-full py-16">
+    <div class="max-w-4xl mx-auto px-6 lg:px-8">
+      
+      <!-- 快速导航 -->
+      <nav class="mb-12 p-6 bg-purple-50 rounded-2xl">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">隐私政策导航</h2>
+        <div class="flex flex-wrap gap-3">
+          {sections.map(section => (
+            <a 
+              href={`#${section.id}`}
+              class="inline-flex items-center px-4 py-2 text-sm bg-white text-purple-600 rounded-full hover:bg-purple-100 transition-colors"
+            >
+              {section.title}
+            </a>
+          ))}
+        </div>
+      </nav>
+
+      <!-- 隐私概览 -->
+      <div class="mb-12 p-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl">
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">隐私保护承诺</h2>
+        <p class="text-gray-700 leading-relaxed mb-4">
+          我们深知个人信息的重要性，并致力于通过以下原则保护您的隐私：
+        </p>
+        <ul class="grid md:grid-cols-2 gap-4 text-gray-700">
+          <li class="flex items-start">
+            <span class="text-purple-600 mr-2">✓</span>
+            <span>最小化数据收集</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-purple-600 mr-2">✓</span>
+            <span>透明的数据使用</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-purple-600 mr-2">✓</span>
+            <span>用户数据控制权</span>
+          </li>
+          <li class="flex items-start">
+            <span class="text-purple-600 mr-2">✓</span>
+            <span>企业级安全保障</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- 隐私政策内容 -->
+      <div class="space-y-12">
+        {sections.map(section => (
+          <article id={section.id} class="scroll-mt-8">
+            <header class="mb-6">
+              <h2 class="text-3xl font-bold text-gray-900 mb-4 border-b-2 border-purple-500 pb-2">
+                {section.title}
+              </h2>
+            </header>
+            
+            <div class="prose prose-lg max-w-none">
+              {section.content.map(paragraph => (
+                <div class="text-gray-700 leading-relaxed mb-4">
+                  {paragraph.split('\n').map((line, index) => (
+                    <div key={index}>
+                      {line.startsWith('**') ? (
+                        <strong class="text-gray-900">{line.replace(/\*\*/g, '')}</strong>
+                      ) : line.startsWith('- ') ? (
+                        <div class="flex items-start mb-2">
+                          <span class="text-purple-600 mr-2 mt-1">•</span>
+                          <span>{line.replace(/^-\s*/, '')}</span>
+                        </div>
+                      ) : (
+                        line
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <!-- 隐私工具 -->
+      <div class="mt-16 p-8 bg-gray-50 rounded-2xl">
+        <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">隐私管理工具</h3>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="text-center p-6 bg-white rounded-xl shadow-sm">
+            <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <h4 class="font-semibold text-gray-900 mb-2">数据访问请求</h4>
+            <p class="text-sm text-gray-600 mb-3">获取我们持有的您的个人信息</p>
+            <a href="mailto:privacy@affdirs.com?subject=数据访问请求" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+              发送请求
+            </a>
+          </div>
+          
+          <div class="text-center p-6 bg-white rounded-xl shadow-sm">
+            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+            </div>
+            <h4 class="font-semibold text-gray-900 mb-2">数据删除请求</h4>
+            <p class="text-sm text-gray-600 mb-3">请求删除您的个人信息</p>
+            <a href="mailto:privacy@affdirs.com?subject=数据删除请求" class="text-red-600 hover:text-red-700 text-sm font-medium">
+              发送请求
+            </a>
+          </div>
+          
+          <div class="text-center p-6 bg-white rounded-xl shadow-sm">
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+            </div>
+            <h4 class="font-semibold text-gray-900 mb-2">隐私问题咨询</h4>
+            <p class="text-sm text-gray-600 mb-3">咨询任何隐私相关问题</p>
+            <a href="mailto:privacy@affdirs.com" class="text-green-600 hover:text-green-700 text-sm font-medium">
+              联系我们
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 结构化数据 -->
+  <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+
+  <!-- 返回顶部按钮 -->
+  <button 
+    id="back-to-top"
+    class="fixed bottom-8 right-8 w-12 h-12 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform scale-0 hover:scale-110 z-50"
+    aria-label="返回顶部"
+  >
+    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+    </svg>
+  </button>
+</Layout>
+
+<style>
+  .scroll-mt-8 {
+    scroll-margin-top: 2rem;
+  }
+</style>
+
+<script>
+  // 返回顶部功能
+  document.addEventListener('DOMContentLoaded', () => {
+    const backToTopBtn = document.getElementById('back-to-top');
+    
+    if (backToTopBtn) {
+      // 显示/隐藏返回顶部按钮
+      window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 300) {
+          backToTopBtn.classList.remove('scale-0');
+          backToTopBtn.classList.add('scale-100');
+        } else {
+          backToTopBtn.classList.remove('scale-100');
+          backToTopBtn.classList.add('scale-0');
+        }
+      });
+
+      // 点击返回顶部
+      backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    }
+  });
+</script>

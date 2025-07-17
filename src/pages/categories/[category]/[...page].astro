@@ -13,7 +13,7 @@ const currentPage = parseInt(pageParam.split('/').pop() || '1');
 const db = getDatabase();
 
 // 获取该分类下的所有文章
-const posts = await db.getPostsByCategory(category || '');
+const posts = await db.getPostsByCategory(decodeURIComponent(category || ''));
 
 // 转换为与内容集合兼容的格式
 const formattedPosts = posts.map(post => ({
@@ -61,7 +61,7 @@ const page = {
 ---
 
 <Layout title={`分类: ${category}`}>
-  <div class="">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
     <h1 class="text-3xl font-bold my-8 text-center">分类: {category}</h1>
     <PostLayout>
         <PostList page={page} />

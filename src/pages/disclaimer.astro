@@ -1,0 +1,351 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// SEO配置 - 深度优化免责声明
+const seoConfig = {
+  title: '免责声明 - AffDirs 精选资源导航平台',
+  description: 'AffDirs平台的完整免责声明，明确服务范围、责任限制、第三方资源声明、内容准确性等重要法律条款，确保用户明确了解使用风险。',
+  keywords: [
+    '免责声明', '法律声明', '责任限制', '第三方资源', '内容准确性',
+    '使用风险', '服务范围', '知识产权声明', '损失免责', '平台责任',
+    'AffDirs声明', '法律条款', '风险承担', '服务保证', '责任免除'
+  ],
+  type: 'website' as const,
+  image: '/og-disclaimer.jpg',
+  imageAlt: 'AffDirs免责声明 - 服务范围和责任限制声明'
+};
+
+// 结构化数据
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "免责声明",
+  "description": "AffDirs精选资源导航平台的免责声明和责任限制声明",
+  "url": "https://affdirs.com/disclaimer",
+  "publisher": {
+    "@type": "Organization",
+    "name": "AffDirs",
+    "url": "https://affdirs.com"
+  },
+  "datePublished": "2024-01-01",
+  "dateModified": new Date().toISOString().split('T')[0]
+};
+
+// 免责声明内容
+const sections = [
+  {
+    title: "重要提示与接受条款",
+    id: "acceptance",
+    content: [
+      "使用AffDirs平台（以下简称'本服务'）即表示您已阅读、理解并同意本免责声明的所有条款。",
+      "如果您不同意本免责声明的任何部分，请立即停止使用本服务。",
+      "我们保留随时更新或修改本免责声明的权利，恕不另行通知。修改后的条款在本页面发布后立即生效。"
+    ]
+  },
+  {
+    title: "服务性质与范围",
+    id: "service-nature",
+    content: [
+      "服务性质：AffDirs是一个精选资源导航平台，提供第三方网站、工具、资源的整理和推荐服务。",
+      "服务范围：我们仅提供资源信息的收集、整理和展示，不提供任何第三方资源的实际内容或服务。",
+      "非商业性质：本服务为非商业性质的信息分享平台，所有推荐资源均基于编辑团队的独立判断。",
+      "服务变更：我们保留随时修改、暂停或终止任何部分服务的权利，无需事先通知。"
+    ]
+  },
+  {
+    title: "第三方资源免责声明",
+    id: "third-party-disclaimer",
+    content: [
+      "第三方独立性：我们推荐的所有第三方资源均由其各自的所有者独立运营和管理，与我们无任何隶属关系。",
+      "内容责任：第三方资源的内容、准确性、完整性、合法性由资源所有者全权负责，我们不承担任何责任。",
+      "使用风险：用户访问和使用第三方资源所产生的任何风险由用户自行承担，包括但不限于：",
+      "- 第三方网站的内容质量、准确性或可靠性",
+      "- 第三方服务的可用性、稳定性或安全性",
+      "- 第三方网站的隐私政策和数据处理方式",
+      "- 第三方资源可能包含的恶意软件或有害内容",
+      "链接检查：虽然我们努力确保推荐资源的质量，但不保证所有链接的有效性或安全性，用户应自行判断。"
+    ]
+  },
+  {
+    title: "内容准确性免责声明",
+    id: "accuracy-disclaimer",
+    content: [
+      "信息时效性：资源信息可能存在时效性，我们无法保证所有信息的实时更新和准确性。",
+      "内容变更：第三方资源的内容、功能、价格等信息可能随时变更，我们不承担更新义务。",
+      "主观评价：部分资源评价和推荐基于编辑团队的主观判断，仅供参考，不构成任何保证。",
+      "技术限制：由于技术限制或第三方限制，某些信息可能不完整或存在误差。",
+      "用户验证：建议用户在使用任何资源前，自行验证相关信息的准确性和适用性。"
+    ]
+  },
+  {
+    title: "知识产权声明",
+    id: "intellectual-property",
+    content: [
+      "版权归属：所有第三方资源的知识产权归其各自所有者所有，我们尊重并保护知识产权。",
+      "内容使用：本服务仅提供资源链接和简要描述，不复制、存储或分发任何第三方内容。",
+      "侵权处理：如发现任何侵犯知识产权的内容，请立即联系我们，我们将及时处理。",
+      "商标声明：所有商标、标识、品牌名称均为其各自所有者的财产，使用仅为识别目的。",
+      "原创声明：除特别说明外，本服务原创内容受版权法保护，未经授权不得转载。"
+    ]
+  },
+  {
+    title: "责任限制条款",
+    id: "liability-limitation",
+    content: [
+      "直接损失限制：在任何情况下，我们对用户因使用本服务而遭受的直接损失不承担责任。",
+      "间接损失免责：我们不承担任何间接的、附带的、特殊的、后果性的或惩罚性的损害赔偿责任，包括但不限于：",
+      "- 利润损失、业务中断、数据丢失",
+      "- 设备损坏或系统故障",
+      "- 第三方行为或疏忽导致的损失",
+      "- 因依赖本服务信息而产生的任何损失",
+      "赔偿上限：即使我们被告知可能发生此类损害，我们的赔偿责任也不超过用户因使用本服务而支付的金额（如有）。",
+      "不可抗力：因不可抗力（包括但不限于自然灾害、战争、政府行为、网络故障）导致的服务中断或损失，我们不承担责任。"
+    ]
+  },
+  {
+    title: "使用风险声明",
+    id: "usage-risk",
+    content: [
+      "网络安全风险：互联网使用存在固有风险，包括但不限于黑客攻击、病毒感染、数据泄露等。",
+      "技术风险：软件工具的使用可能存在技术风险，用户应根据自身技术能力谨慎选择。",
+      "法律风险：不同地区对网络工具和服务的法律法规不同，用户应确保合规使用。",
+      "商业风险：免费工具可能随时转为付费或停止服务，商业用户应做好风险评估。",
+      "数据风险：用户应自行备份重要数据，我们不承担因数据丢失造成的任何损失。"
+    ]
+  },
+  {
+    title: "服务保证免责声明",
+    id: "service-warranty",
+    content: [
+      "无保证声明：本服务按'现状'和'可用'基础提供，不提供任何明示或暗示的保证。",
+      "功能保证：我们不保证服务的连续性、及时性、安全性或无错误运行。",
+      "适用性保证：不保证服务适合用户的特定需求或目的。",
+      "结果保证：不保证通过本服务获得的结果的准确性或可靠性。",
+      "第三方保证：对任何第三方通过本服务提供的保证或承诺不承担任何责任。"
+    ]
+  },
+  {
+    title: "商业用途限制",
+    id: "commercial-use",
+    content: [
+      "非投资建议：本服务提供的任何信息均不构成投资建议、商业建议或专业咨询。",
+      "商业决策：用户在做出任何商业决策前，应寻求专业意见并进行独立判断。",
+      "投资风险：涉及投资、商业合作的资源使用，用户应自行承担全部风险。",
+      "合规责任：商业用户应确保其使用行为符合相关法律法规要求。",
+      "许可验证：商业用户应自行验证所需资源的使用许可和授权范围。"
+    ]
+  },
+  {
+    title: "管辖法律与争议解决",
+    id: "jurisdiction",
+    content: [
+      "适用法律：本免责声明受中华人民共和国法律管辖。",
+      "争议解决：因使用本服务产生的任何争议，双方应首先友好协商解决；协商不成的，提交AffDirs所在地有管辖权的人民法院诉讼解决。",
+      "条款独立性：如本免责声明的任何条款被认定为无效或不可执行，不影响其他条款的有效性。",
+      "权利放弃：我们未行使或执行本免责声明的任何权利或条款，不构成对该权利或条款的放弃。",
+      "完整协议：本免责声明构成用户与我们之间关于使用服务的完整协议。"
+    ]
+  },
+  {
+    title: "联系与反馈",
+    id: "contact-feedback",
+    content: [
+      "问题咨询：如对本免责声明有任何疑问，请通过以下方式联系我们：",
+      "- 邮箱：legal@affdirs.com",
+      "- 主题请注明'免责声明咨询'",
+      "问题报告：发现任何问题或安全隐患，请立即通知我们：",
+      "- 邮箱：support@affdirs.com",
+      "- 主题请注明'问题报告'",
+      "反馈建议：欢迎提供改进建议，帮助我们提升服务质量：",
+      "- 邮箱：feedback@affdirs.com",
+      "响应时间：我们将在收到邮件后5个工作日内回复。"
+    ]
+  }
+];
+
+const lastUpdated = new Date().toLocaleDateString('zh-CN', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+---
+
+<Layout {...seoConfig}>
+  <!-- 页面头部 -->
+  <section class="w-full bg-gradient-to-b from-gray-50 to-white py-20">
+    <div class="max-w-4xl mx-auto px-6 lg:px-8 text-center">
+      <h1 class="text-5xl md:text-6xl font-bold tracking-tight mb-6">
+        <span class="bg-gradient-to-r from-gray-900 via-orange-800 to-red-800 bg-clip-text text-transparent">
+          免责声明
+        </span>
+      </h1>
+      <p class="text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto mb-4">
+        请仔细阅读以下条款，了解使用本服务的风险和责任
+      </p>
+      <p class="text-sm text-gray-500">
+        最后更新日期：{lastUpdated}
+      </p>
+    </div>
+  </section>
+
+  <!-- 主要内容 -->
+  <section class="w-full py-16">
+    <div class="max-w-4xl mx-auto px-6 lg:px-8">
+      
+      <!-- 风险警告横幅 -->
+      <div class="mb-12 p-6 bg-red-50 border-l-4 border-red-500 rounded-r-2xl">
+        <div class="flex items-start">
+          <div class="flex-shrink-0">
+            <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-lg font-semibold text-red-800 mb-2">重要提醒</h3>
+            <p class="text-red-700">
+              使用本服务即表示您已充分理解并接受所有风险和责任限制。请在使用前仔细阅读全部条款。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 快速导航 -->
+      <nav class="mb-12 p-6 bg-orange-50 rounded-2xl">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">免责声明导航</h2>
+        <div class="flex flex-wrap gap-3">
+          {sections.map(section => (
+            <a 
+              href={`#${section.id}`}
+              class="inline-flex items-center px-4 py-2 text-sm bg-white text-orange-600 rounded-full hover:bg-orange-100 transition-colors"
+            >
+              {section.title}
+            </a>
+          ))}
+        </div>
+      </nav>
+
+      <!-- 免责声明内容 -->
+      <div class="space-y-12">
+        {sections.map(section => (
+          <article id={section.id} class="scroll-mt-8">
+            <header class="mb-6">
+              <h2 class="text-3xl font-bold text-gray-900 mb-4 border-b-2 border-orange-500 pb-2">
+                {section.title}
+              </h2>
+            </header>
+            
+            <div class="prose prose-lg max-w-none">
+              {section.content.map(paragraph => (
+                <div class="text-gray-700 leading-relaxed mb-4">
+                  {paragraph.split('\n').map((line, index) => (
+                    <div key={index}>
+                      {line.startsWith('- ') ? (
+                        <div class="flex items-start mb-2 ml-4">
+                          <span class="text-orange-600 mr-2 mt-1">•</span>
+                          <span>{line.replace(/^-\s*/, '')}</span>
+                        </div>
+                      ) : (
+                        <p class="mb-2">{line}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <!-- 用户确认 -->
+      <div class="mt-16 p-8 bg-gradient-to-r from-orange-50 to-red-50 rounded-2xl text-center">
+        <h3 class="text-xl font-semibold text-gray-900 mb-4">
+          继续使用即表示您已阅读并理解本免责声明
+        </h3>
+        <p class="text-gray-600 mb-6">
+          我们建议您保存或打印本免责声明以备将来参考
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a 
+            href="/"
+            class="inline-flex items-center px-6 py-3 bg-orange-600 text-white rounded-full font-medium hover:bg-orange-700 transition-colors"
+          >
+            返回首页
+          </a>
+          <button 
+            onclick="window.print()"
+            class="inline-flex items-center px-6 py-3 bg-gray-200 text-gray-700 rounded-full font-medium hover:bg-gray-300 transition-colors"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            打印声明
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 结构化数据 -->
+  <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+
+  <!-- 返回顶部按钮 -->
+  <button 
+    id="back-to-top"
+    class="fixed bottom-8 right-8 w-12 h-12 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform scale-0 hover:scale-110 z-50"
+    aria-label="返回顶部"
+  >
+    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+    </svg>
+  </button>
+</Layout>
+
+<style>
+  .scroll-mt-8 {
+    scroll-margin-top: 2rem;
+  }
+
+  /* 打印样式 */
+  @media print {
+    .fixed {
+      display: none !important;
+    }
+    
+    section:first-child {
+      padding: 2rem 0;
+    }
+    
+    .bg-gradient-to-b,
+    .bg-gradient-to-r {
+      background: white !important;
+    }
+  }
+</style>
+
+<script>
+  // 返回顶部功能
+  document.addEventListener('DOMContentLoaded', () => {
+    const backToTopBtn = document.getElementById('back-to-top');
+    
+    if (backToTopBtn) {
+      // 显示/隐藏返回顶部按钮
+      window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 300) {
+          backToTopBtn.classList.remove('scale-0');
+          backToTopBtn.classList.add('scale-100');
+        } else {
+          backToTopBtn.classList.remove('scale-100');
+          backToTopBtn.classList.add('scale-0');
+        }
+      });
+
+      // 点击返回顶部
+      backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    }
+  });
+</script>

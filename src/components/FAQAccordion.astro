@@ -1,0 +1,223 @@
+---
+export interface FAQItem {
+  question: string;
+  answer: string;
+  category: string;
+  keywords: string[];
+}
+
+const faqData: FAQItem[] = [
+  {
+    question: "AffDirs是如何筛选和收录优质资源的？",
+    answer: "我们采用多维度评估体系：1) 实用性评估 - 工具是否解决真实痛点；2) 质量评估 - 界面设计、用户体验、稳定性；3) 社区反馈 - GitHub stars、用户评分、专业评测；4) 更新维护 - 活跃开发、持续迭代；5) 免费价值 - 免费版本的功能完整性。每个资源都经过至少2名编辑的独立评审，确保推荐质量。",
+    category: "质量控制",
+    keywords: ["筛选标准", "质量评估", "收录机制"]
+  },
+  {
+    question: "如何高效使用搜索功能找到所需资源？",
+    answer: "我们提供多种搜索策略：1) 精准搜索 - 使用具体关键词如'React图标库'；2) 模糊搜索 - 输入'设计工具'获取相关类别；3) 标签筛选 - 结合多个标签如'免费+AI+图像处理'；4) 分类浏览 - 按开发、设计、AI等大类快速定位；5) 快捷键操作 - Ctrl+K快速唤起搜索。支持中英文双语搜索。",
+    category: "使用技巧",
+    keywords: ["搜索技巧", "标签筛选", "快捷键"]
+  },
+  {
+    question: "资源的更新频率是怎样的？如何获取最新资源？",
+    answer: "更新机制：1) 日常更新 - 每日新增5-10个精选资源；2) 周度专题 - 每周聚焦特定领域深度推荐；3) 月度盘点 - 发布行业趋势报告和工具榜单；4) 实时维护 - 失效链接24小时内处理。获取方式：订阅RSS、关注我们的社交媒体、开启浏览器通知、加入邮件列表。",
+    category: "更新机制",
+    keywords: ["更新频率", "最新资源", "订阅通知"]
+  },
+  {
+    question: "如何提交自己发现的好工具或建议？",
+    answer: "多种提交渠道：1) 在线提交表单 - /submit 页面填写详细信息；2) GitHub Issues - 在我们的仓库提交Issue；3) 邮件推荐 - 发送邮件至 feedback@affdirs.com；4) 社交媒体 - 通过Twitter @AffDirs 或微博私信。提交时请注明：工具名称、网址、功能描述、推荐理由、适用人群。优质推荐者将获得署名感谢。",
+    category: "社区贡献",
+    keywords: ["资源提交", "推荐机制", "社区参与"]
+  },
+  {
+    question: "分类标签系统是如何设计的？如何理解标签含义？",
+    answer: "标签体系采用三级结构：1) 一级大类 - 开发工具、设计资源、AI工具、学习教程、效率工具；2) 二级类型 - 前端框架、UI组件、图标库、AI绘画、在线课程等；3) 三级属性 - 免费/付费、开源/商业、中文/英文、Web/桌面/移动。标签支持交叉筛选，帮助用户精准定位需求场景。",
+    category: "分类体系",
+    keywords: ["标签系统", "分类标准", "筛选逻辑"]
+  },
+  {
+    question: "如何收藏和管理自己喜欢的资源？",
+    answer: "提供多种收藏方式：1) 浏览器书签 - 支持一键添加当前资源到书签；2) 个人收藏夹 - 注册用户可创建多个收藏夹分类管理；3) 导出功能 - 支持导出为JSON、CSV格式；4) 分享功能 - 生成分享链接或二维码；5) 评分系统 - 为资源打分并撰写使用心得。未来将支持收藏夹的云端同步。",
+    category: "个人管理",
+    keywords: ["收藏功能", "个人收藏", "资源管理"]
+  }
+];
+
+const categories = [...new Set(faqData.map(item => item.category))];
+---
+
+<div class="faq-section max-w-4xl mx-auto px-4 py-12">
+  <!-- 标题区域 -->
+  <div class="text-center mb-12">
+    <h2 class="text-4xl font-bold bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent mb-4">
+      常见问题
+    </h2>
+    <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+      了解如何更好地使用AffDirs发现和管理优质资源
+    </p>
+  </div>
+
+  <!-- 分类筛选 -->
+  <div class="flex flex-wrap justify-center gap-3 mb-8">
+    <button class="faq-category-btn active px-4 py-2 rounded-full text-sm font-medium transition-all bg-blue-600 text-white shadow-md" data-category="all">
+      全部问题
+    </button>
+    {categories.map(category => (
+      <button class="faq-category-btn px-4 py-2 rounded-full text-sm font-medium transition-all bg-gray-100 text-gray-700 hover:bg-gray-200" data-category={category}>
+        {category}
+      </button>
+    ))}
+  </div>
+
+  <!-- 手风琴内容 -->
+  <div class="space-y-4" id="faq-container">
+    {faqData.map((item, index) => (
+      <div class="faq-item bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all hover:shadow-md" data-category={item.category}>
+        <button 
+          class="faq-question w-full px-6 py-4 text-left flex items-center justify-between group hover:bg-gray-50 transition-colors"
+          aria-expanded="false"
+          aria-controls={`faq-answer-${index}`}
+        >
+          <div class="flex items-center space-x-3">
+            <span class="text-blue-600 font-bold text-lg">{index + 1}</span>
+            <h3 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+              {item.question}
+            </h3>
+          </div>
+          <div class="transform transition-transform duration-200 group-hover:scale-110">
+            <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
+        </button>
+        
+        <div 
+          id={`faq-answer-${index}`}
+          class="faq-answer px-6 pb-4 hidden"
+          aria-hidden="true"
+        >
+          <div class="pt-2 pb-2 border-t border-gray-100">
+            <p class="text-gray-700 leading-relaxed mb-4">
+              {item.answer}
+            </p>
+            
+            <!-- 关键词标签 -->
+            <div class="flex flex-wrap gap-2">
+              {item.keywords.map(keyword => (
+                <span class="inline-block px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded-full font-medium">
+                  #{keyword}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <!-- 底部提示 -->
+  <div class="text-center mt-12 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl">
+    <h3 class="text-lg font-semibold text-gray-900 mb-2">没有找到你的问题？</h3>
+    <p class="text-gray-600 mb-4">
+      我们随时欢迎你的反馈和建议，可以通过以下方式联系我们
+    </p>
+    <div class="flex justify-center space-x-4">
+      <a href="/submit" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-medium hover:bg-blue-700 transition-colors">
+        提交问题
+      </a>
+      <a href="mailto:feedback@affdirs.com" class="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-full text-sm font-medium hover:bg-gray-700 transition-colors">
+        邮件反馈
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .faq-item.active .faq-answer {
+    display: block;
+  }
+  
+  .faq-item.active .transform svg {
+    transform: rotate(180deg);
+  }
+</style>
+
+<script>
+  // 手风琴交互逻辑
+  document.addEventListener('DOMContentLoaded', () => {
+    const faqContainer = document.getElementById('faq-container');
+    const categoryBtns = document.querySelectorAll('.faq-category-btn');
+    
+    if (!faqContainer) return;
+
+    // 分类筛选功能
+    categoryBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const category = btn.dataset.category;
+        
+        // 更新按钮状态
+        categoryBtns.forEach(b => b.classList.remove('active', 'bg-blue-600', 'text-white', 'shadow-md'));
+        categoryBtns.forEach(b => b.classList.add('bg-gray-100', 'text-gray-700'));
+        btn.classList.add('active', 'bg-blue-600', 'text-white', 'shadow-md');
+        btn.classList.remove('bg-gray-100', 'text-gray-700');
+        
+        // 筛选FAQ项目
+        const faqItems = faqContainer.querySelectorAll('.faq-item');
+        faqItems.forEach(item => {
+          const itemCategory = item.dataset.category;
+          if (category === 'all' || itemCategory === category) {
+            item.style.display = 'block';
+            item.style.animation = 'fadeIn 0.3s ease-in-out';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    // 手风琴展开/收起功能
+    const questions = faqContainer.querySelectorAll('.faq-question');
+    questions.forEach(question => {
+      question.addEventListener('click', () => {
+        const item = question.closest('.faq-item');
+        const answer = question.nextElementSibling;
+        const isExpanded = question.getAttribute('aria-expanded') === 'true';
+        
+        // 关闭其他所有项目
+        questions.forEach(q => {
+          if (q !== question) {
+            q.setAttribute('aria-expanded', 'false');
+            q.closest('.faq-item')?.classList.remove('active');
+            q.nextElementSibling?.setAttribute('aria-hidden', 'true');
+            q.nextElementSibling?.classList.add('hidden');
+          }
+        });
+        
+        // 切换当前项目
+        if (isExpanded) {
+          question.setAttribute('aria-expanded', 'false');
+          item?.classList.remove('active');
+          answer?.setAttribute('aria-hidden', 'true');
+          answer?.classList.add('hidden');
+        } else {
+          question.setAttribute('aria-expanded', 'true');
+          item?.classList.add('active');
+          answer?.setAttribute('aria-hidden', 'false');
+          answer?.classList.remove('hidden');
+        }
+      });
+    });
+
+    // 添加淡入动画样式
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    `;
+    document.head.appendChild(style);
+  });
+</script>

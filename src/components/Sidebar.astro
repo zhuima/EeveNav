@@ -19,7 +19,7 @@ const tags = await getTags()
             {
                 categories.map(category => (
                     <li class="py-4">
-                        <a href={`/categories/${category?.name}`}>{category?.name}
+                        <a href={`/categories/${encodeURIComponent(category?.name)}`}>{category?.name}
                         <span class="ml-1">({category?.count})</span>
                         </a>
                     </li>
@@ -34,7 +34,7 @@ const tags = await getTags()
             {
                 tags.map(tag => (
                     <li class="px-1 py-2 text-xs border rounded-lg block leading-6 hover:border-ring">
-                        <a href={`/tags/${tag}`}>{tag}
+                        <a href={`/tags/${encodeURIComponent(tag)}`}>{tag}
                         </a>
                     </li>
                 ))

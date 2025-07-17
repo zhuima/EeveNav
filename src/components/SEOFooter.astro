@@ -1,0 +1,261 @@
+---
+// Footer链接数据结构
+interface FooterLink {
+  name: string;
+  href: string;
+  description?: string;
+  rel?: string;
+}
+
+interface FooterSection {
+  title: string;
+  links: FooterLink[];
+  icon?: string;
+}
+
+// 内部导航链接（提升内链SEO）
+const internalLinks: FooterSection[] = [
+  {
+    title: "核心功能",
+    icon: "⚡",
+    links: [
+      { name: "首页", href: "/", description: "发现最新优质资源" },
+      { name: "资源浏览", href: "/blog", description: "按分类浏览所有资源" },
+      { name: "热门搜索", href: "/#hot-search", description: "查看热门搜索关键词" },
+      { name: "提交资源", href: "/submit", description: "推荐你发现的优质工具" },
+      { name: "常见问题", href: "/faq", description: "解答使用疑问和获取帮助" },
+    ]
+  },
+  {
+    title: "分类导航",
+    icon: "📂",
+    links: [
+      { name: "开发工具", href: "/categories/开发工具", description: "前端、后端、移动端开发工具" },
+      { name: "设计资源", href: "/categories/设计资源", description: "UI设计、图标、插画资源" },
+      { name: "AI工具", href: "/categories/AI工具", description: "人工智能相关的工具和服务" },
+      { name: "学习教程", href: "/categories/学习教程", description: "编程、设计、产品学习资源" },
+    ]
+  },
+  {
+    title: "权威资源",
+    icon: "🔗",
+    links: [
+      { name: "GitHub", href: "https://github.com", description: "全球最大的代码托管平台", rel: "noopener noreferrer" },
+      { name: "MDN Web Docs", href: "https://developer.mozilla.org", description: "Web技术权威文档", rel: "noopener noreferrer" },
+      { name: "Stack Overflow", href: "https://stackoverflow.com", description: "程序员问答社区", rel: "noopener noreferrer" },
+      { name: "Dribbble", href: "https://dribbble.com", description: "设计师作品展示平台", rel: "noopener noreferrer" },
+    ]
+  }
+];
+
+// 社交媒体链接（使用内联SVG避免404）
+const socialLinks = [
+  { name: "GitHub", href: "https://github.com/zhuima", icon: "github" },
+  { name: "Twitter", href: "https://twitter.com/ilovek8s", icon: "twitter" },
+];
+
+// 特色标签云（SEO关键词）
+const tagCloud = [
+  "资源导航", "开发工具", "设计素材", "AI工具", "前端框架",
+  "图标库", "学习教程", "效率工具", "开源项目", "在线工具"
+];
+
+// 法律和政策链接
+const legalLinks = [
+  { name: "使用条款", href: "/terms" },
+  { name: "隐私政策", href: "/privacy" },
+  { name: "免责声明", href: "/disclaimer" },
+];
+---
+
+<footer class="bg-gradient-to-b from-gray-50 to-white border-t border-gray-200">
+  <!-- 主要内容区域 -->
+  <div class="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">      
+      
+      <!-- 品牌介绍区域 -->
+      <div>
+        <div class="mb-6">
+          <div class="flex items-center space-x-3 mb-4">
+            <div class="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+              </svg>
+            </div>
+            <span class="text-2xl font-bold text-gray-900">AffDirs</span>
+          </div>
+          <p class="text-gray-600 text-sm leading-relaxed mb-4">
+            精心整理的优质资源导航平台，致力于帮助开发者、设计师和创作者发现最佳工具和灵感。
+          </p>
+        </div>
+        
+        <!-- 社交媒体链接（内联SVG避免404） -->
+        <div class="flex space-x-3">          
+          <a 
+            href="https://github.com/zhuima" 
+            class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors group"
+            aria-label="在GitHub上关注我们"
+            rel="noopener noreferrer"
+          >
+            <svg class="w-5 h-5 text-gray-600 group-hover:text-gray-800" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"></path>
+            </svg>
+          </a>
+          
+          <a 
+            href="https://twitter.com/ilovek8s" 
+            class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors group"
+            aria-label="在Twitter上关注我们"
+            rel="noopener noreferrer"
+          >
+            <svg class="w-5 h-5 text-gray-600 group-hover:text-gray-800" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"></path>
+            </svg>
+          </a>
+          
+
+        </div>
+      </div>
+
+      <!-- 分类导航和权威资源 -->
+      {internalLinks.map(section => (
+        <div key={section.title}>
+          <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4 flex items-center">
+            <span class="mr-2">{section.icon}</span>
+            {section.title}
+          </h3>
+          <ul class="space-y-3">
+            {section.links.map(link => (
+              <li key={link.name}>
+                <a 
+                  href={link.href} 
+                  class="text-sm text-gray-600 hover:text-blue-600 transition-colors block"
+                  title={link.description}
+                  rel={link.rel || ""}
+                >
+                  {link.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+
+    </div>
+
+    <!-- 标签云区域 -->
+    <div class="border-t border-gray-200 pt-8 mb-8">
+      <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">
+        热门标签
+      </h3>
+      <div class="flex flex-wrap gap-2">
+        {tagCloud.map(tag => (
+          <a 
+            href={`/tags/${tag.toLowerCase().replace(/\s+/g, '-')}`}
+            class="inline-block px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full hover:bg-blue-100 hover:text-blue-700 transition-colors"
+          >
+            {tag}
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <!-- 底部版权和法律信息 -->
+    <div class="border-t border-gray-200 pt-8">
+      <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">        
+        <!-- 版权信息 -->
+        <div class="text-sm text-gray-600 text-center md:text-left">
+          <p>
+            &copy; {new Date().getFullYear()} AffDirs. <span class="font-medium">精选资源导航平台</span>
+          </p>
+          <p class="text-xs text-gray-500 mt-1">
+            让每一次搜索都有价值 - 发现优质工具、教程与灵感
+          </p>
+        </div>
+
+        <!-- 法律链接 -->
+        <div class="flex flex-wrap justify-center md:justify-end space-x-6">
+          {legalLinks.map(link => (
+            <a 
+              href={link.href} 
+              class="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              {link.name}
+            </a>
+          ))}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 结构化数据 -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "AffDirs",
+    "description": "精选资源导航平台 - 发现优质工具、教程与灵感",
+    "url": "https://affdirs.com",
+    "publisher": {
+      "@type": "Organization",
+      "name": "AffDirs",
+      "url": "https://affdirs.com"
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://affdirs.com/search?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  })} />
+
+  <!-- 返回顶部按钮 -->
+  <button 
+    id="back-to-top"
+    class="fixed bottom-8 right-8 w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform scale-0 hover:scale-110 z-50"
+    aria-label="返回顶部"
+  >
+    <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+    </svg>
+  </button>
+</footer>
+
+<script>
+  // 返回顶部功能
+  document.addEventListener('DOMContentLoaded', () => {
+    const backToTopBtn = document.getElementById('back-to-top');
+    
+    if (backToTopBtn) {
+      // 显示/隐藏返回顶部按钮
+      window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 300) {
+          backToTopBtn.classList.remove('scale-0');
+          backToTopBtn.classList.add('scale-100');
+        } else {
+          backToTopBtn.classList.remove('scale-100');
+          backToTopBtn.classList.add('scale-0');
+        }
+      });
+
+      // 点击返回顶部
+      backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    }
+  });
+</script>
+
+<style>
+  .scale-0 {
+    transform: scale(0);
+  }
+  .scale-100 {
+    transform: scale(1);
+  }
+</style>
