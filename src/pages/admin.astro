@@ -396,14 +396,15 @@ async function loadStats() {
     }
 
     const posts = await postsRes.json()
-    const categories = await categoriesRes.json()
+    const categoriesData = await categoriesRes.json()
     const tags = await tagsRes.json()
 
-    console.log('原始数据:', { posts, categories, tags })
+    console.log('原始数据:', { posts, categories: categoriesData, tags })
 
-    // 确保返回的是数组
+    // 处理API响应结构
     const postsArray = Array.isArray(posts) ? posts : []
-    const categoriesArray = Array.isArray(categories) ? categories : []
+    const categoriesArray = Array.isArray(categoriesData) ? categoriesData : 
+                           (categoriesData.categories || [])
     const tagsArray = Array.isArray(tags) ? tags : []
 
     console.log('处理后的数组:', {
@@ -517,7 +518,7 @@ function loadCategoriesOverview(categories: any[]) {
         <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
         <span class="text-sm font-medium text-gray-900">${category.name}</span>
       </div>
-      <span class="text-xs text-gray-500">${category.count} 篇</span>
+      <span class="text-xs text-gray-500">${category.count || 0} 篇</span>
     </div>
   `).join('')
 }

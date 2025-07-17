@@ -700,6 +700,25 @@ export class BlogDatabase {
     }))
   }
 
+  // 添加分类
+  async addCategory(categoryName: string): Promise<void> {
+    await this.initialized
+    
+    // 检查分类是否已存在
+    const existingCategories = await this.getCategories()
+    const exists = existingCategories.some(cat => cat.name.toLowerCase() === categoryName.toLowerCase())
+    
+    if (exists) {
+      throw new Error(`分类 "${categoryName}" 已存在`)
+    }
+
+    // 添加新分类
+    await this.db.execute({
+      sql: 'INSERT INTO categories (name) VALUES (?)',
+      args: [categoryName]
+    })
+  }
+
   // 关闭数据库连接
   close() {
     // Turso client 不需要手动关闭连接

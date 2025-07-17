@@ -419,6 +419,33 @@ export const POST: APIRoute = async ({ request }) => {
         }
       }
 
+      case 'add-category': {
+        const { categoryName } = data
+        if (!categoryName) {
+          return new Response(JSON.stringify({ error: '分类名称不能为空' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        }
+
+        try {
+          await db.addCategory(categoryName)
+          return new Response(JSON.stringify({ message: '分类添加成功' }), {
+            status: 201,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : '添加分类失败'
+          const status = errorMessage.includes('已存在') ? 409 : 400
+          return new Response(JSON.stringify({ 
+            error: errorMessage
+          }), {
+            status: status,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        }
+      }
+
       case 'copy-post': {
         const { postId, newSlug } = data
         if (!postId) {
