@@ -119,14 +119,14 @@ const legalLinks = [
 
       <!-- 分类导航和权威资源 -->
       {internalLinks.map(section => (
-        <div key={section.title}>
+        <div>
           <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4 flex items-center">
             <span class="mr-2">{section.icon}</span>
             {section.title}
           </h3>
           <ul class="space-y-3">
             {section.links.map(link => (
-              <li key={link.name}>
+              <li>
                 <a 
                   href={link.href} 
                   class="text-sm text-gray-600 hover:text-blue-600 transition-colors block"

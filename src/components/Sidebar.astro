@@ -32,7 +32,7 @@ const tags = await getTags()
         <h3 class="font-bold title relative pl-4">标签</h3>
         <ul class="flex flex-wrap gap-4 mt-4">
             {
-                tags.map(tag => (
+                tags.map((tag: string) => (
                     <li class="px-1 py-2 text-xs border rounded-lg block leading-6 hover:border-ring">
                         <a href={`/tags/${encodeURIComponent(tag)}`}>{tag}
                         </a>

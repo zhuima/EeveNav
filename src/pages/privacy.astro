@@ -257,7 +257,7 @@ const lastUpdated = new Date().toLocaleDateString('zh-CN', {
               {section.content.map(paragraph => (
                 <div class="text-gray-700 leading-relaxed mb-4">
                   {paragraph.split('\n').map((line, index) => (
-                    <div key={index}>
+                    <div>
                       {line.startsWith('**') ? (
                         <strong class="text-gray-900">{line.replace(/\*\*/g, '')}</strong>
                       ) : line.startsWith('- ') ? (

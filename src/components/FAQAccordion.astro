@@ -155,7 +155,7 @@ const categories = [...new Set(faqData.map(item => item.category))];
     // 分类筛选功能
     categoryBtns.forEach(btn => {
       btn.addEventListener('click', () => {
-        const category = btn.dataset.category;
+        const category = (btn as HTMLElement).dataset.category;
         
         // 更新按钮状态
         categoryBtns.forEach(b => b.classList.remove('active', 'bg-blue-600', 'text-white', 'shadow-md'));
@@ -166,12 +166,12 @@ const categories = [...new Set(faqData.map(item => item.category))];
         // 筛选FAQ项目
         const faqItems = faqContainer.querySelectorAll('.faq-item');
         faqItems.forEach(item => {
-          const itemCategory = item.dataset.category;
+          const itemCategory = (item as HTMLElement).dataset.category;
           if (category === 'all' || itemCategory === category) {
-            item.style.display = 'block';
-            item.style.animation = 'fadeIn 0.3s ease-in-out';
+            (item as HTMLElement).style.display = 'block';
+            (item as HTMLElement).style.animation = 'fadeIn 0.3s ease-in-out';
           } else {
-            item.style.display = 'none';
+            (item as HTMLElement).style.display = 'none';
           }
         });
       });
