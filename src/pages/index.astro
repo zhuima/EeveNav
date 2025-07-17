@@ -155,11 +155,11 @@ const seoConfig = {
               itemtype="https://schema.org/CreativeWork"
             >
               <!-- 封面图片 -->
-              <div class="relative overflow-hidden bg-gray-50">
+              <div class="relative overflow-hidden bg-gray-50 aspect-[16/9]">
                 <img 
                   src={post.cover} 
                   alt={`${post.title}的预览图`}
-                  class="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
+                  class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   loading="lazy"
                   itemprop="image"
                 />

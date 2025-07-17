@@ -16,15 +16,15 @@ const externalUrl = postData.external_url;
 ---
 
 <div class="w-full">
-  <article class="rounded-lg shadow-lg h-full overflow-hidden">
-    <div class="cursor-pointer w-full h-40 sm:h-48 relative">
-      <a href={`/posts/${postSlug}`} target={externalUrl ? "_blank" : "_self"}>
+  <article class="rounded-lg shadow-lg h-full overflow-hidden transition-all duration-300 hover:shadow-xl">
+    <div class="cursor-pointer w-full relative aspect-[16/9] overflow-hidden">
+      <a href={`/posts/${postSlug}`} target={externalUrl ? "_blank" : "_self"} class="block w-full h-full">
         <Image
           loading="lazy"
-          class="rounded-t-lg object-cover w-full h-full"
+          class="w-full h-full object-cover transition-transform duration-300 hover:scale-105 rounded-t-lg"
           src={postCover}
           width={400}
-          height={240}
+          height={225}
           alt={postTitle}
         />
         {externalUrl && (
