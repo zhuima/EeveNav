@@ -1,4 +1,9 @@
 ---
+import { getCategories } from '@/utils'
+
+// 获取动态分类数据
+const categories = await getCategories()
+
 // Footer链接数据结构
 interface FooterLink {
   name: string;
@@ -29,12 +34,11 @@ const internalLinks: FooterSection[] = [
   {
     title: "分类导航",
     icon: "📂",
-    links: [
-      { name: "开发工具", href: "/categories/开发工具", description: "前端、后端、移动端开发工具" },
-      { name: "设计资源", href: "/categories/设计资源", description: "UI设计、图标、插画资源" },
-      { name: "AI工具", href: "/categories/AI工具", description: "人工智能相关的工具和服务" },
-      { name: "学习教程", href: "/categories/学习教程", description: "编程、设计、产品学习资源" },
-    ]
+    links: categories.map(category => ({
+      name: `${category.name} (${category.count})`,
+      href: `/categories/${encodeURIComponent(category.name)}`,
+      description: `查看${category.count}个${category.name}相关资源`
+    }))
   },
   {
     title: "权威资源",
