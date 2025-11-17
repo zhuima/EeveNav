@@ -2,7 +2,6 @@
   "buildCommand": "npx astro build",
   "outputDirectory": ".vercel/output",
   "framework": "astro",
-  "regions": ["sin1", "hkg1"],
   "functions": {
     "src/pages/api/**/*.ts": {
       "runtime": "nodejs20.x",
