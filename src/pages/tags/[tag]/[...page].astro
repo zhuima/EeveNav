@@ -2,7 +2,10 @@
 import PostList from '@/components/post/PostList.astro'
 import Layout from '@/layouts/Layout.astro'
 import PostLayout from '@/layouts/PostLayout.astro'
-import { getDatabase } from '../../../lib/database'
+import { getCachedDatabase } from '../../../lib/cached-database'
+
+// 服务端渲染
+export const prerender = false;
 
 // 获取URL参数
 const { tag } = Astro.params;

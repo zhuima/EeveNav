@@ -2,10 +2,11 @@
 import PostList from '@/components/post/PostList.astro'
 import Layout from '@/layouts/Layout.astro'
 import PostLayout from '@/layouts/PostLayout.astro'
-import { getCollection } from 'astro:content'
+import { getCachedDatabase } from '../../lib/cached-database'
 
 export async function getStaticPaths({ paginate }) {
-    const allPosts = await getCollection('blog')
+    const db = getCachedDatabase();
+    const allPosts = await db.getPosts()
     const result = paginate(allPosts, {
       pageSize: 20,
       // 自定义路由格式

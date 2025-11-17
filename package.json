@@ -7,11 +7,16 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro check && astro build",
+    "build": "node scripts/build-and-cache.js",
+    "build:fast": "astro build",
     "preview": "astro preview",
     "astro": "astro",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "build:analyze": "npm run build && npx @vercel/analyzer",
+    "revalidate:home": "curl -X POST 'https://your-domain.com/api/revalidate/home?secret=YOUR_SECRET'",
+    "revalidate:all": "curl -X POST 'https://your-domain.com/api/revalidate/all?secret=YOUR_SECRET'",
+    "cache:warmup": "node scripts/warmup-cache.js"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.3",

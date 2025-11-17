@@ -2,6 +2,9 @@
 import AdminLayout from '@/layouts/AdminLayout.astro'
 import { getDatabase } from '@/lib/database'
 
+// 服务端渲染，不预渲染
+export const prerender = false;
+
 // 检查用户是否已登录
 const cookies = Astro.cookies
 const isAuthenticated = cookies.get('admin_auth')?.value === 'authenticated'

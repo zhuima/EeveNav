@@ -1,25 +1,61 @@
 ---
 import Layout from '../layouts/Layout.astro'
-import { getCachedDatabase } from '../lib/cached-database'
-import { ensureDatabaseData } from '../lib/migration'
+import { getDatabase } from '../lib/database'
+import type { Post, Category, Tag } from '../lib/database'
 
-// 确保数据库有数据
-await ensureDatabaseData()
+// 预渲染此页面
+export const prerender = true;
 
-// 使用带缓存的数据库
-const db = getCachedDatabase()
-const allPosts = await db.getPosts()
+interface Props {
+  posts: Post[];
+  categories: Category[];
+  tags: string[];
+  generatedAt: string;
+}
+
+export async function getStaticPaths() {
+  try {
+    const db = getDatabase()
+    const [posts, categories, tags] = await Promise.all([
+      db.getPosts(),
+      db.getCategories(),
+      db.getTags()
+    ]);
+
+    return [{ params: {}, props: { posts, categories, tags, generatedAt: new Date().toISOString() }}]
+  } catch (error) {
+    console.error('Failed to generate static paths:', error)
+    return []
+  }
+}
+
+// 解构props，提供默认值
+let { posts, categories, tags, generatedAt } = Astro.props || {};
+
+// 安全检查 - 开发模式下的回退
+if (!posts || !Array.isArray(posts)) {
+  console.log('Posts data not available in dev mode, fetching from database...');
+  const db = getDatabase();
+  const allPosts = await db.getPosts();
+  const allCategories = await db.getCategories();
+  const allTags = await db.getTags();
+
+  // 重新赋值变量
+  posts = allPosts;
+  categories = allCategories;
+  tags = allTags;
+  generatedAt = new Date().toISOString();
+}
+
 // 只获取有external_url的第三方站点
-const posts = allPosts.filter(post => post.external_url && post.external_url.trim() !== '')
-const categories = await db.getCategories()
-const tags = await db.getTags()
+const filteredPosts = posts.filter(post => post.external_url && post.external_url.trim() !== '')
 
 // SEO配置
 const seoConfig = {
   title: 'AffDirs - 精选资源导航 | 发现优质工具、教程与灵感',
-  description: `精心整理的${posts.length}+优质第三方资源，涵盖${categories.length}个分类。包含开发工具、设计资源、学习教程、AI工具等。让每一次搜索都有价值，助力您的创意与开发工作。`,
+  description: `精心整理的${filteredPosts.length}+优质第三方资源，涵盖${categories.length}个分类。包含开发工具、设计资源、学习教程、AI工具等。让每一次搜索都有价值，助力您的创意与开发工作。`,
   keywords: [
-    '资源导航', '开发工具', '设计资源', '学习教程', '创意灵感', 
+    '资源导航', '开发工具', '设计资源', '学习教程', '创意灵感',
     'AI工具', '免费图标', '编程学习', '前端开发', '设计工具',
     'AffDirs', '资源收藏', '工具推荐', '技术博客'
   ],
@@ -50,12 +86,12 @@ const seoConfig = {
             <span class="text-gray-500">让每一次搜索都有价值</span>
           </p>
         </header>
-        
+
         <!-- 核心搜索区域 -->
         <div class="relative max-w-4xl mx-auto mb-16">
           <!-- 背景装饰 -->
           <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-3xl blur-3xl"></div>
-          
+
           <!-- 搜索框容器 -->
           <div class="relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/50 p-8">
             <div class="relative">
@@ -66,11 +102,11 @@ const seoConfig = {
                   </svg>
                 </div>
               </div>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 id="search-input"
                 name="search"
-                placeholder="搜索你需要的资源、工具、文章..." 
+                placeholder="搜索你需要的资源、工具、文章..."
                 class="w-full pl-20 pr-6 py-6 text-xl font-medium bg-transparent border-0 focus:outline-none focus:ring-0 placeholder-gray-400 text-gray-900"
                 autocomplete="off"
                 role="searchbox"
@@ -82,7 +118,7 @@ const seoConfig = {
                 <kbd class="px-2 py-1 bg-gray-100 rounded text-xs">K</kbd>
               </div>
             </div>
-            
+
             <!-- 热门搜索标签 -->
             <div class="flex flex-wrap justify-center gap-2 mt-6 pt-6 border-t border-gray-100">
               <span class="text-sm text-gray-500 mr-2">热门：</span>
@@ -97,7 +133,7 @@ const seoConfig = {
         <!-- 统计信息 -->
         <div class="grid grid-cols-3 gap-8 max-w-2xl mx-auto mb-12">
           <div class="text-center">
-            <div class="text-3xl font-bold text-gray-900" aria-label={`共${posts.length}个精选资源`}>{posts.length}</div>
+            <div class="text-3xl font-bold text-gray-900" aria-label={`共${filteredPosts.length}个精选资源`}>{filteredPosts.length}</div>
             <div class="text-sm text-gray-500 font-medium">精选资源</div>
           </div>
           <div class="text-center">
@@ -117,7 +153,7 @@ const seoConfig = {
       <div class="max-w-7xl mx-auto px-6 lg:px-8">
         <h2 class="sr-only">按分类筛选资源</h2>
         <div class="flex flex-wrap justify-center gap-3 mb-12" role="group" aria-label="分类筛选按钮">
-          <button 
+          <button
             class="filter-btn active px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300 bg-gray-900 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
             data-category="all"
             aria-pressed="true"
@@ -126,7 +162,7 @@ const seoConfig = {
             全部资源
           </button>
           {categories.map(category => (
-            <button 
+            <button
               class="filter-btn px-6 py-3 rounded-full text-sm font-semibold transition-all duration-300 bg-white text-gray-700 hover:bg-gray-50 shadow-md hover:shadow-lg border border-gray-200 transform hover:-translate-y-0.5"
               data-category={category.name}
               aria-pressed="false"
@@ -145,8 +181,8 @@ const seoConfig = {
       <div class="max-w-7xl mx-auto px-6 lg:px-8">
         <h2 class="sr-only">精选资源列表</h2>
         <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {posts.map(post => (
-            <article 
+          {filteredPosts.map(post => (
+            <article
               class="resource-card group bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100/50 overflow-hidden"
               data-category={post.category}
               data-tags={post.tags.join(',')}
@@ -157,8 +193,8 @@ const seoConfig = {
             >
               <!-- 封面图片 -->
               <div class="relative overflow-hidden bg-gray-50 aspect-[16/9]">
-                <img 
-                  src={post.cover} 
+                <img
+                  src={post.cover}
                   alt={`${post.title}的预览图`}
                   class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   loading="lazy"
@@ -166,7 +202,7 @@ const seoConfig = {
                 />
                 <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
-              
+
               <div class="p-6">
                 <!-- 分类标签 -->
                 <div class="flex items-center justify-between mb-3">
@@ -174,7 +210,7 @@ const seoConfig = {
                     {post.category}
                   </span>
                 </div>
-                
+
                 <!-- 标题和描述 -->
                 <h3 class="font-bold text-gray-900 mb-3 line-clamp-2 text-lg group-hover:text-blue-600 transition-colors" itemprop="name">
                   {post.title}
@@ -182,7 +218,7 @@ const seoConfig = {
                 <p class="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed" itemprop="description">
                   {post.des}
                 </p>
-                
+
                 <!-- 标签 -->
                 <div class="flex flex-wrap gap-1 mb-6">
                   {post.tags.slice(0, 3).map(tag => (
@@ -196,11 +232,11 @@ const seoConfig = {
                     </span>
                   )}
                 </div>
-                
+
                 <!-- 操作按钮 -->
                 <div class="flex gap-2">
                   {post.external_url && (
-                    <a 
+                    <a
                       href={post.external_url}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -214,7 +250,7 @@ const seoConfig = {
                       </svg>
                     </a>
                   )}
-                  <a 
+                  <a
                     href={`/posts/${post.slug}`}
                     class="flex-1 inline-flex items-center justify-center px-4 py-2 text-sm font-semibold bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 transform hover:-translate-y-0.5"
                     aria-label={`查看${post.title}的详细信息`}
@@ -226,7 +262,7 @@ const seoConfig = {
             </article>
           ))}
         </div>
-        
+
         <!-- 无结果提示 -->
         <div id="no-results" class="hidden text-center py-20" role="status" aria-live="polite">
           <div class="max-w-md mx-auto">
@@ -237,7 +273,7 @@ const seoConfig = {
             </div>
             <h3 class="text-xl font-semibold text-gray-900 mb-2">没有找到相关资源</h3>
             <p class="text-gray-600 mb-6">试试调整搜索关键词或选择其他分类</p>
-            <button 
+            <button
               onclick="document.getElementById('search-input').value = ''; document.querySelector('[data-category=all]').click();"
               class="inline-flex items-center px-6 py-3 text-sm font-semibold bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
               aria-label="清空搜索条件并重新开始"
@@ -251,146 +287,224 @@ const seoConfig = {
   </main>
 </Layout>
 
+<!-- 静态数据传递给客户端 -->
+<script define:vars={{ filteredPosts, categories, tags }}>
+  // 全局数据存储
+  window.APP_DATA = {
+    posts: filteredPosts,
+    categories: categories,
+    tags: tags,
+    generatedAt: new Date().toISOString()
+  };
+</script>
+
 <script>
-  // 搜索功能
-  const searchInput = document.getElementById('search-input') as HTMLInputElement
-  const resourceCards = document.querySelectorAll('.resource-card') as NodeListOf<HTMLElement>
-  const filterBtns = document.querySelectorAll('.filter-btn') as NodeListOf<HTMLButtonElement>
-  const noResults = document.getElementById('no-results') as HTMLElement
-
-  let currentCategory = 'all'
-
-  // 搜索函数
-  function searchResources(query: string) {
-    const searchTerm = query.toLowerCase().trim()
-    let visibleCount = 0
-
-    resourceCards.forEach(card => {
-      const title = card.dataset.title || ''
-      const description = card.dataset.description || ''
-      const tags = card.dataset.tags || ''
-      const category = card.dataset.category || ''
-
-      const matchesSearch = !searchTerm || 
-        title.includes(searchTerm) || 
-        description.includes(searchTerm) || 
-        tags.toLowerCase().includes(searchTerm)
-
-      const matchesCategory = currentCategory === 'all' || category === currentCategory
-
-      if (matchesSearch && matchesCategory) {
-        card.style.display = 'block'
-        visibleCount++
-      } else {
-        card.style.display = 'none'
-      }
-    })
-
-    // 显示/隐藏无结果提示
-    if (visibleCount === 0) {
-      noResults.classList.remove('hidden')
-    } else {
-      noResults.classList.add('hidden')
-    }
-  }
-
-  // 分类过滤函数
-  function filterByCategory(category: string) {
-    currentCategory = category
-
-    // 更新按钮状态
-    filterBtns.forEach(btn => {
-      btn.classList.remove('active', 'bg-gray-900', 'text-white', 'shadow-lg')
-      btn.classList.add('bg-white', 'text-gray-700', 'border', 'border-gray-200', 'shadow-md')
-    })
-
-    const activeBtn = document.querySelector(`[data-category="${category}"]`) as HTMLButtonElement
-    if (activeBtn) {
-      activeBtn.classList.add('active', 'bg-gray-900', 'text-white', 'shadow-lg')
-      activeBtn.classList.remove('bg-white', 'text-gray-700', 'border', 'border-gray-200', 'shadow-md')
+  // 高性能客户端搜索
+  class ResourceSearch {
+    constructor() {
+      this.posts = window.APP_DATA.posts;
+      this.categories = window.APP_DATA.categories;
+      this.tags = window.APP_DATA.tags;
+      this.currentCategory = 'all';
+      this.searchIndex = this.buildSearchIndex();
+      this.init();
     }
 
-    // 如果点击分类按钮时搜索框有内容，清空搜索框以避免冲突
-    if (searchInput.value.trim()) {
-      searchInput.value = ''
+    buildSearchIndex() {
+      const index = new Map();
+      this.posts.forEach((post, idx) => {
+        const searchText = [
+          post.title,
+          post.des,
+          post.category,
+          ...post.tags
+        ].join(' ').toLowerCase();
+
+        const words = searchText.split(/\s+/);
+        words.forEach(word => {
+          if (word.length > 1) {
+            if (!index.has(word)) {
+              index.set(word, new Set());
+            }
+            index.get(word).add(idx);
+          }
+        });
+      });
+      return index;
     }
 
-    // 重新搜索以应用新的分类过滤
-    searchResources('')
-  }
+    init() {
+      this.setupSearch();
+      this.setupFilters();
+      this.setupKeyboardShortcuts();
+      this.setupHotSearchTags();
+      this.setupSearchFocus();
+    }
 
-  // 热门搜索标签点击事件
-  function setupHotSearchTags() {
-    const hotTags = document.querySelectorAll('.hot-tag') as NodeListOf<HTMLButtonElement>
-    hotTags.forEach(tag => {
-      tag.addEventListener('click', (e) => {
-        e.preventDefault()
-        const searchTerm = tag.dataset.search || tag.textContent || ''
-        
-        // 重置分类过滤到"全部资源"
-        currentCategory = 'all'
-        filterBtns.forEach(btn => {
-          btn.classList.remove('active', 'bg-gray-900', 'text-white', 'shadow-lg')
-          btn.classList.add('bg-white', 'text-gray-700', 'border', 'border-gray-200', 'shadow-md')
-        })
-        const allBtn = document.querySelector(`[data-category="all"]`) as HTMLButtonElement
-        if (allBtn) {
-          allBtn.classList.add('active', 'bg-gray-900', 'text-white', 'shadow-lg')
-          allBtn.classList.remove('bg-white', 'text-gray-700', 'border', 'border-gray-200', 'shadow-md')
+    search(query) {
+      const searchTerm = query.toLowerCase().trim();
+      if (!searchTerm) return this.posts;
+
+      // 使用搜索索引提高性能
+      const words = searchTerm.split(/\s+/);
+      let resultIndices = null;
+
+      words.forEach(word => {
+        const indices = this.searchIndex.get(word) || new Set();
+        if (resultIndices === null) {
+          resultIndices = indices;
+        } else {
+          // 取交集
+          resultIndices = new Set([...resultIndices].filter(x => indices.has(x)));
         }
-        
-        // 设置搜索值并执行搜索
-        searchInput.value = searchTerm
-        searchInput.focus()
-        searchResources(searchTerm)
-      })
-    })
-  }
+      });
 
-  // 键盘快捷键 (⌘+K 或 Ctrl+K)
-  function setupKeyboardShortcuts() {
-    document.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault()
-        searchInput.focus()
-        searchInput.select()
+      const results = resultIndices ? [...resultIndices].map(idx => this.posts[idx]) : [];
+
+      // 按相关性排序
+      return results.sort((a, b) => {
+        const aRelevance = this.calculateRelevance(a, searchTerm);
+        const bRelevance = this.calculateRelevance(b, searchTerm);
+        return bRelevance - aRelevance;
+      });
+    }
+
+    calculateRelevance(post, searchTerm) {
+      let score = 0;
+      const titleMatch = post.title.toLowerCase().indexOf(searchTerm);
+      const descMatch = post.des.toLowerCase().indexOf(searchTerm);
+      const categoryMatch = post.category.toLowerCase().indexOf(searchTerm);
+
+      if (titleMatch === 0) score += 10;
+      else if (titleMatch > -1) score += 5;
+
+      if (descMatch === 0) score += 3;
+      else if (descMatch > -1) score += 1;
+
+      if (categoryMatch > -1) score += 2;
+
+      // 标签匹配
+      post.tags.forEach(tag => {
+        if (tag.toLowerCase().indexOf(searchTerm) > -1) score += 1;
+      });
+
+      return score;
+    }
+
+    filterByCategory(category) {
+      this.currentCategory = category;
+      this.updateCategoryButtons();
+      this.performSearch();
+    }
+
+    performSearch() {
+      const searchInput = document.getElementById('search-input');
+      const query = searchInput.value;
+
+      let results = this.search(query);
+
+      // 应用分类过滤
+      if (this.currentCategory !== 'all') {
+        results = results.filter(post => post.category === this.currentCategory);
       }
-    })
+
+      this.renderResults(results);
+    }
+
+    renderResults(results) {
+      const resourceCards = document.querySelectorAll('.resource-card');
+      const noResults = document.getElementById('no-results');
+
+      resourceCards.forEach(card => {
+        const title = card.dataset.title;
+        const shouldShow = results.some(post =>
+          post.title.toLowerCase() === title
+        );
+        card.style.display = shouldShow ? 'block' : 'none';
+      });
+
+      noResults.classList.toggle('hidden', results.length > 0);
+    }
+
+    setupSearch() {
+      const searchInput = document.getElementById('search-input');
+      let searchTimeout;
+
+      searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => this.performSearch(), 150);
+      });
+    }
+
+    setupFilters() {
+      const filterBtns = document.querySelectorAll('.filter-btn');
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const category = btn.dataset.category || 'all';
+          this.filterByCategory(category);
+        });
+      });
+    }
+
+    updateCategoryButtons() {
+      const filterBtns = document.querySelectorAll('.filter-btn');
+      filterBtns.forEach(btn => {
+        const isActive = btn.dataset.category === this.currentCategory;
+        btn.classList.toggle('active', isActive);
+        btn.classList.toggle('bg-gray-900', isActive);
+        btn.classList.toggle('text-white', isActive);
+        btn.classList.toggle('shadow-lg', isActive);
+        btn.classList.toggle('bg-white', !isActive);
+        btn.classList.toggle('text-gray-700', !isActive);
+        btn.classList.toggle('border', !isActive);
+        btn.classList.toggle('border-gray-200', !isActive);
+        btn.classList.toggle('shadow-md', !isActive);
+      });
+    }
+
+    setupKeyboardShortcuts() {
+      document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+          e.preventDefault();
+          document.getElementById('search-input').focus();
+        }
+      });
+    }
+
+    setupHotSearchTags() {
+      const hotTags = document.querySelectorAll('.hot-tag');
+      hotTags.forEach(tag => {
+        tag.addEventListener('click', () => {
+          const searchTerm = tag.dataset.search || tag.textContent;
+          this.currentCategory = 'all';
+          this.updateCategoryButtons();
+          document.getElementById('search-input').value = searchTerm;
+          this.performSearch();
+        });
+      });
+    }
+
+    setupSearchFocus() {
+      const searchInput = document.getElementById('search-input');
+      const searchContainer = searchInput.closest('.relative.bg-white\\/80');
+
+      searchInput.addEventListener('focus', () => {
+        searchContainer?.classList.add('ring-4', 'ring-blue-500/20');
+      });
+
+      searchInput.addEventListener('blur', () => {
+        searchContainer?.classList.remove('ring-4', 'ring-blue-500/20');
+      });
+    }
   }
 
-  // 搜索框焦点效果
-  function setupSearchFocus() {
-    const searchContainer = searchInput.closest('.relative.bg-white\\/80')
-    
-    searchInput.addEventListener('focus', () => {
-      searchContainer?.classList.add('ring-4', 'ring-blue-500/20')
-    })
-    
-    searchInput.addEventListener('blur', () => {
-      searchContainer?.classList.remove('ring-4', 'ring-blue-500/20')
-    })
-  }
-
-  // 绑定事件
-  searchInput.addEventListener('input', (e) => {
-    const target = e.target as HTMLInputElement
-    searchResources(target.value)
-  })
-
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const category = btn.dataset.category || 'all'
-      filterByCategory(category)
-    })
-  })
-
-  // 初始化
-  setupHotSearchTags()
-  setupKeyboardShortcuts()
-  setupSearchFocus()
+  // 初始化搜索功能
+  document.addEventListener('DOMContentLoaded', () => {
+    new ResourceSearch();
+  });
 
   // 添加增强的CSS样式
-  const style = document.createElement('style')
+  const style = document.createElement('style');
   style.textContent = `
     .line-clamp-2 {
       display: -webkit-box;
@@ -398,30 +512,30 @@ const seoConfig = {
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
-    
+
     .line-clamp-3 {
       display: -webkit-box;
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
-    
+
     .filter-btn {
       backdrop-filter: blur(8px);
     }
-    
+
     .filter-btn:hover {
       transform: translateY(-2px);
     }
-    
+
     .resource-card {
       backdrop-filter: blur(8px);
     }
-    
+
     .resource-card:hover {
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
     }
-    
+
     @media (prefers-reduced-motion: reduce) {
       .resource-card,
       .filter-btn {
@@ -429,25 +543,24 @@ const seoConfig = {
         transition: none !important;
       }
     }
-    
+
     /* 自定义滚动条 */
     ::-webkit-scrollbar {
       width: 8px;
     }
-    
+
     ::-webkit-scrollbar-track {
       background: #f1f5f9;
     }
-    
+
     ::-webkit-scrollbar-thumb {
       background: #cbd5e1;
       border-radius: 4px;
     }
-    
+
     ::-webkit-scrollbar-thumb:hover {
       background: #94a3b8;
     }
-  `
-  document.head.appendChild(style)
+  `;
+  document.head.appendChild(style);
 </script>
-</Layout>

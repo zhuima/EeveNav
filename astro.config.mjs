@@ -1,13 +1,11 @@
 import { defineConfig } from 'astro/config'
 import UnoCSS from 'unocss/astro'
-import vercel from '@astrojs/vercel/serverless'
+import node from '@astrojs/node'
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'server',
-  adapter: vercel({
-    nodeVersion: '20'
-  }),
+  output: 'hybrid', // 混合模式：静态页面 + 服务端页面
+  adapter: node({ mode: 'standalone' }), // 使用Node.js适配器支持混合模式
   integrations: [
     UnoCSS({
       injectReset: true,

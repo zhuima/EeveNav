@@ -1,0 +1,81 @@
+# 静态资源缓存策略
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# HTML文件 - 短缓存以支持更新
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Frame-Options: SAMEORIGIN
+
+# 静态资源 - 长期缓存
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/images/*
+  Cache-Control: public, max-age=86400
+  X-Content-Type-Options: nosniff
+
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# API路由 - 不缓存（或短期缓存）
+/api/*
+  Cache-Control: no-cache, no-store, must-revalidate
+  X-Content-Type-Options: nosniff
+
+# 首页 - 短期缓存
+/
+  Cache-Control: public, max-age=300, stale-while-revalidate=60
+
+# 分类和标签页面 - 中等缓存
+/categories/*
+  Cache-Control: public, max-age=1800, stale-while-revalidate=300
+
+/tags/*
+  Cache-Control: public, max-age=1800, stale-while-revalidate=300
+
+# 文章页面 - 长期缓存但支持重新验证
+/posts/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=600
+
+# 字体文件 - 永久缓存
+*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+*.woff
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+*.ttf
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+# SVG文件
+*.svg
+  Cache-Control: public, max-age=86400
+  X-Content-Type-Options: nosniff
+
+# 安全头部
+/admin/*
+  Cache-Control: no-cache, no-store, must-revalidate
+  X-Frame-Options: SAMEORIGIN
+
+# JSON文件
+/*.json
+  Cache-Control: public, max-age=300
+
+# 站点地图
+/sitemap.xml
+  Cache-Control: public, max-age=86400
+
+/robots.txt
+  Cache-Control: public, max-age=86400
+
+# manifest.json
+/manifest.json
+  Cache-Control: public, max-age=86400

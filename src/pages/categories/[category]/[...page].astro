@@ -2,15 +2,18 @@
 import PostList from '@/components/post/PostList.astro'
 import Layout from '@/layouts/Layout.astro'
 import PostLayout from '@/layouts/PostLayout.astro'
-import { getDatabase } from '../../../lib/database'
+import { getCachedDatabase } from '../../../lib/cached-database'
+
+// 服务端渲染，动态生成
+export const prerender = false;
 
 // 获取URL参数
 const { category } = Astro.params;
 const pageParam = Astro.params.page || '1';
 const currentPage = parseInt(pageParam.split('/').pop() || '1');
 
-// 获取数据库实例
-const db = getDatabase();
+// 获取数据库实例（用于fallback情况）
+const db = getCachedDatabase();
 
 // 获取该分类下的所有文章
 const posts = await db.getPostsByCategory(decodeURIComponent(category || ''));

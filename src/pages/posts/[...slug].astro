@@ -2,11 +2,14 @@
 import Layout from '@/layouts/Layout.astro'
 import PostLayout from '@/layouts/PostLayout.astro'
 import { getDate } from '@/utils'
-import { getDatabase } from '../../lib/database'
+import { getCachedDatabase } from '../../lib/cached-database'
+
+// 服务端渲染，支持动态内容
+export const prerender = false;
 
 // 使用动态路由参数获取文章
 const { slug } = Astro.params;
-const db = getDatabase();
+const db = getCachedDatabase();
 const post = await db.getPostBySlug(slug);
 
 // 如果文章不存在，返回404
