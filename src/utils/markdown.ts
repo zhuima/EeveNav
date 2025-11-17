@@ -36,19 +36,21 @@ renderer.code = function({ text: code, lang: language }: { text: string; lang?: 
   } else {
     highlightedCode = hljs.highlightAuto(code).value
   }
-  
+
   const lines = highlightedCode.split('\n')
-  const numberedLines = lines.map((line, index) => {
-    return `<span class="code-line" data-line="${index + 1}">${line}</span>`
+  const numberedLines = lines.map((line) => {
+    return `<span class="code-line">${line}</span>`
   }).join('\n')
-  
+
   const copyId = 'copy-' + Math.random().toString(36).substring(2, 9)
-  
+  // 将原始代码进行Base64编码，明确使用UTF-8编码
+  const encodedCode = Buffer.from(code, 'utf-8').toString('base64')
+
   return `<div class="code-block-container">
     <div class="code-header">
       <span class="code-language">${lang}</span>
       <div class="code-actions">
-        <button class="copy-button" data-copy-id="${copyId}" title="复制代码" aria-label="复制代码">
+        <button class="copy-button" data-code="${encodedCode}" title="复制代码" aria-label="复制代码">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="copy-icon">
             <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
             <path d="m4 16c-1.1 0-2-.9-2-2v-10c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
@@ -122,27 +124,22 @@ export function initializeCharts(): string {
         // 代码复制功能
         document.querySelectorAll('.copy-button').forEach(button => {
           button.addEventListener('click', async () => {
-            const copyId = button.dataset.copyId
-            const codeElement = document.getElementById(copyId || '')
+            const encodedCode = button.dataset.code
             const copyIcon = button.querySelector('.copy-icon')
             const successIcon = button.querySelector('.success-icon')
             const errorIcon = button.querySelector('.error-icon')
 
-            if (codeElement && copyIcon && successIcon && errorIcon) {
+            if (encodedCode && copyIcon && successIcon && errorIcon) {
               try {
-                // 获取纯文本内容（去掉HTML标签和行号）
-                const lines = codeElement.querySelectorAll('.code-line')
-                let text = ''
-                lines.forEach(line => {
-                  // 获取每行的文本内容，排除行号
-                  const lineText = line.textContent || ''
-                  // 移除行号部分（通过正则表达式或分割）
-                  const cleanText = lineText.replace(/^\s*\d+\s*/, '')
-                  text += cleanText + '\n'
-                })
-                text = text.trim()
+                // 从Base64解码获取原始代码 - 正确处理UTF-8
+                const binaryString = atob(encodedCode)
+                const bytes = new Uint8Array(binaryString.length)
+                for (let i = 0; i < binaryString.length; i++) {
+                  bytes[i] = binaryString.charCodeAt(i)
+                }
+                const code = new TextDecoder('utf-8').decode(bytes)
 
-                await navigator.clipboard.writeText(text)
+                await navigator.clipboard.writeText(code)
 
                 // 显示复制成功状态
                 copyIcon.classList.add('hidden')
