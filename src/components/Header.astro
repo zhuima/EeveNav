@@ -249,8 +249,11 @@ const navs = [
 </header>
 
 <script>
-  // 移动端菜单切换
-  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  // 等待DOM加载完成
+  document.addEventListener('DOMContentLoaded', () => {
+
+    // 移动端菜单切换
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
   const mobileMenu = document.getElementById('mobile-menu');
   
   if (mobileMenuButton && mobileMenu) {
@@ -278,7 +281,7 @@ const navs = [
   }
   
   // 更新主题图标
-  function updateThemeIcons(isDark: boolean) {
+  function updateThemeIcons(isDark) {
     const icons = [themeToggle, mobileThemeToggle].filter(Boolean);
     icons.forEach(button => {
       if (button) {
@@ -335,24 +338,54 @@ const navs = [
   initTheme();
 
   // 全局搜索功能
+  console.log('=== 初始化搜索相关元素 ===');
   const headerSearchBtn = document.getElementById('header-search-btn');
   const searchModal = document.getElementById('search-modal');
   const searchOverlay = document.getElementById('search-overlay');
   const closeSearchModal = document.getElementById('close-search-modal');
-  const globalSearchInput = document.getElementById('global-search-input') as HTMLInputElement;
+  const globalSearchInput = document.getElementById('global-search-input');
   const searchLoading = document.getElementById('search-loading');
   const searchEmpty = document.getElementById('search-empty');
   const searchItems = document.getElementById('search-items');
 
+  console.log('搜索元素检查:');
+  console.log('- headerSearchBtn:', headerSearchBtn);
+  console.log('- searchModal:', searchModal);
+  console.log('- searchOverlay:', searchOverlay);
+  console.log('- closeSearchModal:', closeSearchModal);
+  console.log('- globalSearchInput:', globalSearchInput);
+  console.log('- searchLoading:', searchLoading);
+  console.log('- searchEmpty:', searchEmpty);
+  console.log('- searchItems:', searchItems);
+
   // 打开搜索模态框
   function openSearchModal() {
+    console.log('=== 开始打开搜索模态框 ===');
+    console.log('searchModal:', searchModal);
+    console.log('globalSearchInput:', globalSearchInput);
+
     if (searchModal) {
+      console.log('移除hidden类');
       searchModal.classList.remove('hidden');
+      console.log('模态框类列表:', searchModal.classList.toString());
+
       setTimeout(() => {
         if (globalSearchInput) {
+          console.log('聚焦搜索输入框');
           globalSearchInput.focus();
+          const val = globalSearchInput.value || '';
+          console.log('当前输入框值:', val);
+          if (val.trim()) {
+            searchResources(val.trim());
+          } else {
+            resetSearchResults();
+          }
+        } else {
+          console.error('搜索输入框不存在');
         }
       }, 100);
+    } else {
+      console.error('搜索模态框不存在');
     }
   }
 
@@ -361,7 +394,7 @@ const navs = [
     if (searchModal) {
       searchModal.classList.add('hidden');
       if (globalSearchInput) {
-        (globalSearchInput as HTMLInputElement).value = '';
+        globalSearchInput.value = '';
       }
       resetSearchResults();
     }
@@ -374,9 +407,15 @@ const navs = [
     if (searchItems) searchItems.innerHTML = '';
   }
 
-  // 搜索资源
-  async function searchResources(query: string) {
-    if (!query.trim()) {
+  // 搜索资源 - 使用客户端搜索避免API参数问题
+  async function searchResources(query) {
+    console.log('=== Header搜索函数开始 ===');
+    console.log('搜索参数:', query);
+    console.log('搜索参数类型:', typeof query);
+    console.log('搜索参数长度:', query ? query.length : 'null/undefined');
+
+    if (!query || !query.trim()) {
+      console.log('搜索词为空，重置结果');
       resetSearchResults();
       return;
     }
@@ -387,9 +426,22 @@ const navs = [
     if (searchItems) searchItems.innerHTML = '';
 
     try {
-      // 调用API进行搜索
-      const response = await fetch(`/api/blog?search=${encodeURIComponent(query)}`);
+      // 使用API搜索真实的博客数据
+      console.log('开始API搜索...');
+      console.log('搜索关键词:', query);
+
+      const response = await fetch('/api/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ search: query.trim() })
+      });
+
+      console.log('API响应状态:', response.status);
+
       const data = await response.json();
+      console.log('API搜索结果:', data);
       
       // 隐藏加载状态
       if (searchLoading) searchLoading.classList.add('hidden');
@@ -425,7 +477,7 @@ const navs = [
   }
 
   // 显示搜索结果
-  function displaySearchResults(posts: any[]) {
+  function displaySearchResults(posts) {
     if (!searchItems) return;
 
     const resultsHTML = posts.slice(0, 8).map((post: any) => `
@@ -448,9 +500,9 @@ const navs = [
   }
 
   // 防抖函数
-  function debounce(func: (...args: any[]) => void, wait: number) {
-    let timeout: NodeJS.Timeout | undefined;
-    return function executedFunction(...args: any[]) {
+  function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
       const later = () => {
         clearTimeout(timeout);
         func(...args);
@@ -461,8 +513,19 @@ const navs = [
   }
 
   // 事件监听器
+  console.log('=== 设置事件监听器 ===');
+  console.log('headerSearchBtn:', headerSearchBtn);
+
   if (headerSearchBtn) {
-    headerSearchBtn.addEventListener('click', openSearchModal);
+    console.log('绑定搜索按钮点击事件');
+    headerSearchBtn.addEventListener('click', (e) => {
+      console.log('搜索按钮被点击', e);
+      e.preventDefault();
+      e.stopPropagation();
+      openSearchModal();
+    });
+  } else {
+    console.error('搜索按钮元素不存在');
   }
 
   if (closeSearchModal) {
@@ -476,13 +539,18 @@ const navs = [
   if (globalSearchInput) {
     const debouncedSearch = debounce(searchResources, 300);
     globalSearchInput.addEventListener('input', (e) => {
-      debouncedSearch((e.target as HTMLInputElement).value);
+      console.log('Header搜索输入事件，值:', e.target.value);
+      debouncedSearch(e.target.value);
     });
 
     // ESC键关闭模态框
     globalSearchInput.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeSearchModalFunc();
+      }
+      if (e.key === 'Enter') {
+        const val = globalSearchInput.value || '';
+        searchResources(val.trim());
       }
     });
   }
@@ -602,4 +670,6 @@ const navs = [
     }
   `;
   document.head.appendChild(darkModeStyle);
+
+  }) // 闭合 DOMContentLoaded 事件监听器
 </script>

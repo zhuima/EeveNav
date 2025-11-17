@@ -252,16 +252,19 @@ const seoConfig = {
 </Layout>
 
 <script>
-  // 搜索功能
-  const searchInput = document.getElementById('search-input') as HTMLInputElement
-  const resourceCards = document.querySelectorAll('.resource-card') as NodeListOf<HTMLElement>
-  const filterBtns = document.querySelectorAll('.filter-btn') as NodeListOf<HTMLButtonElement>
-  const noResults = document.getElementById('no-results') as HTMLElement
+  // 等待DOM加载完成
+  document.addEventListener('DOMContentLoaded', () => {
+    // 搜索功能
+    const searchInput = document.getElementById('search-input') as HTMLInputElement
+    const resourceCards = document.querySelectorAll('.resource-card') as NodeListOf<HTMLElement>
+    const filterBtns = document.querySelectorAll('.filter-btn') as NodeListOf<HTMLButtonElement>
+    const noResults = document.getElementById('no-results') as HTMLElement
 
-  let currentCategory = 'all'
+    let currentCategory = 'all'
 
   // 搜索函数
   function searchResources(query: string) {
+    console.log('搜索函数调用:', query)
     const searchTerm = query.toLowerCase().trim()
     let visibleCount = 0
 
@@ -449,5 +452,6 @@ const seoConfig = {
     }
   `
   document.head.appendChild(style)
+  }) // 闭合 DOMContentLoaded 事件监听器
 </script>
 </Layout>

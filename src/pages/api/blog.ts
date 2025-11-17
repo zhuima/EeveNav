@@ -1,16 +1,38 @@
 import type { APIRoute } from 'astro'
 import { getDatabase, PostSchema } from '../../lib/database'
 
+// 防止预渲染,确保作为服务器端点运行
+export const prerender = false
+
 export const GET: APIRoute = async ({ url, request }) => {
   try {
-    console.log('API called with URL:', url)
-    console.log('Request URL:', request.url)
-    
-    // 使用request.url而不是url参数
-    const requestUrl = new URL(request.url)
+    // 尝试多种方式获取查询参数
+    console.log('=== API Debug ===')
+    console.log('url parameter:', url?.toString())
+    console.log('request.url:', request.url)
+
+    let requestUrl: URL
+
+    if (url) {
+      requestUrl = url
+      console.log('Using url parameter')
+    } else {
+      requestUrl = new URL(request.url)
+      console.log('Using request.url')
+    }
+
+    console.log('Final URL:', requestUrl.toString())
+    console.log('Search params string:', requestUrl.searchParams.toString())
+    console.log('All search params:')
+    requestUrl.searchParams.forEach((value, key) => {
+      console.log(`  ${key}: ${value}`)
+    })
+
+    // 从URL参数中获取查询参数
     const action = requestUrl.searchParams.get('action')
     const searchQuery = requestUrl.searchParams.get('search')
-    
+
+    console.log('Extracted parameters:')
     console.log('Action parameter:', action)
     console.log('Search parameter:', searchQuery)
     
