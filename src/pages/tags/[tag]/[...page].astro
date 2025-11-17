@@ -12,8 +12,8 @@ const { tag } = Astro.params;
 const pageParam = Astro.params.page || '1';
 const currentPage = parseInt(pageParam.split('/').pop() || '1');
 
-// 获取数据库实例
-const db = getDatabase();
+// 获取数据库实例（使用带缓存的数据库）
+const db = getCachedDatabase();
 
 // 获取包含此标签的所有文章
 const posts = await db.getPostsByTag(decodeURIComponent(tag || ''));

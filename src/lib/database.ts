@@ -289,7 +289,16 @@ export class BlogDatabase {
 
     const result = await this.db.execute(query)
     const rows = result.rows as { name: string }[]
-    return rows.map(row => row.name)
+    const unique = new Set<string>()
+    for (const row of rows) {
+      const name = row.name || ''
+      const parts = name.split(/[\s,]+/)
+      for (const p of parts) {
+        const t = p.trim().replace(/^#+/, '')
+        if (t) unique.add(t)
+      }
+    }
+    return Array.from(unique)
   }
 
   // 根据分类获取文章
@@ -327,21 +336,21 @@ export class BlogDatabase {
     await this.initialized
     const query = `
       SELECT 
-        p.*,
+        p.*, 
         GROUP_CONCAT(t2.name) as tags
       FROM posts p
       INNER JOIN post_tags pt ON p.id = pt.post_id
       INNER JOIN tags t ON pt.tag_id = t.id
       LEFT JOIN post_tags pt2 ON p.id = pt2.post_id
       LEFT JOIN tags t2 ON pt2.tag_id = t2.id
-      WHERE t.name = ?
+      WHERE t.name = ? OR t.name LIKE ? COLLATE NOCASE
       GROUP BY p.id
       ORDER BY p.date DESC
     `
 
     const result = await this.db.execute({
       sql: query,
-      args: [tag]
+      args: [tag, `%${tag}%`]
     })
     const rows = result.rows as any[]
 
