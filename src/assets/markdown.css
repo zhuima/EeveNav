@@ -1,518 +1,597 @@
-/* Mermaid图表样式 */
-.mermaid-container {
-  @apply my-6 text-center;
-}
-
-.mermaid {
-  @apply bg-white rounded-xl shadow-lg p-6 inline-block border border-gray-100;
-  min-width: 300px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-/* ECharts图表样式 */
-.echarts-container {
-  @apply my-6;
-}
-
-.echarts-chart {
-  @apply bg-white rounded-xl shadow-lg border border-gray-100 p-4;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-.echarts-container .error {
-  @apply bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-center shadow-sm;
-}
-
-/* 代码块容器样式 */
+/* ============================================
+   代码块容器 - macOS风格
+   ============================================ */
 .code-block-container {
-  @apply my-6 rounded-lg overflow-hidden border border-gray-700/40;
-  background: #0d1117;
+  @apply my-8 rounded-xl overflow-hidden shadow-2xl;
+  background: linear-gradient(145deg, #1a1f2e 0%, #0f1419 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   position: relative;
-  box-shadow: none;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* macOS窗口顶部装饰 */
 .code-block-container::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #60a5fa, transparent);
-  opacity: 0.3;
+  height: 2px;
+  background: linear-gradient(90deg,
+    rgba(255, 95, 109, 0.6) 0%,
+    rgba(255, 189, 68, 0.6) 33%,
+    rgba(40, 205, 65, 0.6) 66%,
+    rgba(94, 92, 230, 0.6) 100%
+  );
+  opacity: 0.8;
 }
 
+.code-block-container:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    0 0 60px rgba(59, 130, 246, 0.15);
+}
+
+/* ============================================
+   代码头部 - macOS窗口控制按钮
+   ============================================ */
 .code-header {
-  @apply flex items-center justify-between px-3 py-2 border-b border-gray-700/40;
-  background: transparent;
-  min-height: 40px;
+  @apply flex items-center justify-between px-5 py-3;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   position: relative;
+  min-height: 48px;
 }
 
-.code-header::after {
+/* macOS风格的窗口控制按钮 */
+.code-header::before {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #475569, transparent);
-  opacity: 0.5;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 8px;
+  width: 52px;
+  height: 12px;
+  background:
+    radial-gradient(circle at 6px 6px, #ff5f57 0%, #ff5f57 5px, transparent 5px),
+    radial-gradient(circle at 26px 6px, #ffbd2e 0%, #ffbd2e 5px, transparent 5px),
+    radial-gradient(circle at 46px 6px, #28ca41 0%, #28ca41 5px, transparent 5px);
+  transition: all 0.3s ease;
+}
+
+/* 悬停时按钮发光 */
+.code-block-container:hover .code-header::before {
+  filter: brightness(1.3) drop-shadow(0 0 4px rgba(255, 95, 87, 0.5));
 }
 
 .code-language {
-  @apply text-xs font-semibold text-blue-300 uppercase tracking-wider;
+  @apply text-sm font-bold tracking-wide ml-16;
+  background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  position: relative;
 }
 
+/* 语言标签图标 */
 .code-language::before {
-  content: '';
-  @apply w-2 h-2 rounded-full;
-  background: linear-gradient(135deg, #60a5fa, #a78bfa);
-  box-shadow: 0 0 8px rgba(96, 165, 250, 0.5);
-  animation: pulse-glow 2s infinite;
+  content: '●';
+  @apply text-blue-400;
+  font-size: 8px;
+  -webkit-text-fill-color: currentColor;
+  animation: pulse-dot 2s ease-in-out infinite;
 }
 
-.code-content-wrapper {
-  @apply relative overflow-hidden;
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.3); }
+}
+
+/* ============================================
+   复制按钮 - 现代玻璃态设计（位于header右侧）
+   ============================================ */
+.code-actions {
+  @apply flex items-center gap-2;
+  position: relative;
+  z-index: 10;
 }
 
 .copy-button {
-  @apply absolute top-2 right-2 p-2 text-gray-300 hover:text-white rounded-md transition-colors border;
-  background: transparent;
-  z-index: 20;
-  box-shadow: none;
-  border-color: rgba(75, 85, 99, 0.4);
+  @apply p-2.5 rounded-lg transition-all duration-300;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   position: relative;
   overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* 波纹扩散效果 */
 .copy-button::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-  transition: left 0.5s ease;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.4), transparent);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+  opacity: 0;
 }
 
 .copy-button:hover::before {
-  left: 100%;
+  width: 200px;
+  height: 200px;
+  opacity: 1;
 }
 
+/* 悬停效果 */
 .copy-button:hover {
-  @apply transform scale-105;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.9), rgba(37, 99, 235, 0.9));
-  border-color: rgba(59, 130, 246, 0.5);
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4), 0 4px 8px rgba(0, 0, 0, 0.3);
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow:
+    0 10px 25px -5px rgba(59, 130, 246, 0.4),
+    0 0 20px rgba(59, 130, 246, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
+/* 按下效果 */
 .copy-button:active {
-  transform: scale(0.95);
+  transform: translateY(0) scale(0.98);
 }
 
-.copy-button.copied {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.9), rgba(22, 163, 74, 0.9));
-  border-color: rgba(34, 197, 94, 0.5);
-  box-shadow: 0 0 24px rgba(34, 197, 94, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3);
-  animation: copy-success 0.6s ease-out;
-}
-
-.copy-button.copy-error {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.9), rgba(220, 38, 38, 0.9));
-  border-color: rgba(239, 68, 68, 0.5);
-  box-shadow: 0 0 24px rgba(239, 68, 68, 0.6), 0 4px 12px rgba(0, 0, 0, 0.3);
-  animation: copy-error 0.6s ease-out;
-}
-
-.code-actions {
-  @apply flex items-center gap-2;
-}
-
+/* SVG图标样式 */
 .copy-button svg {
-  @apply transition-all duration-300;
+  @apply transition-all duration-300 relative z-10;
   width: 18px;
   height: 18px;
+  color: #9ca3af;
+  filter: drop-shadow(0 0 2px rgba(156, 163, 175, 0.3));
 }
 
-.copy-button .hidden {
-  @apply hidden;
+.copy-button:hover svg {
+  color: #ffffff;
+  filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.8));
+  animation: icon-float 2s ease-in-out infinite;
 }
 
-.copy-button:active {
-  transform: scale(0.95);
+/* 图标浮动动画 */
+@keyframes icon-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+/* 复制成功状态 */
+.copy-button.copied {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(22, 163, 74, 0.15));
+  border-color: rgba(34, 197, 94, 0.4);
+  box-shadow:
+    0 0 30px rgba(34, 197, 94, 0.5),
+    0 8px 20px rgba(34, 197, 94, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  animation: success-pulse 0.6s ease-out;
 }
 
 .copy-button.copied svg {
+  color: #22c55e;
+  filter: drop-shadow(0 0 10px rgba(34, 197, 94, 0.8));
   animation: icon-bounce 0.6s ease-out;
 }
 
+/* 复制错误状态 */
+.copy-button.copy-error {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.15));
+  border-color: rgba(239, 68, 68, 0.4);
+  box-shadow:
+    0 0 30px rgba(239, 68, 68, 0.5),
+    0 8px 20px rgba(239, 68, 68, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  animation: error-shake 0.6s ease-out;
+}
+
 .copy-button.copy-error svg {
+  color: #ef4444;
+  filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.8));
   animation: icon-shake 0.6s ease-out;
 }
 
-@keyframes icon-bounce {
-  0%, 20%, 60%, 100% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(-6px);
-  }
-  80% {
-    transform: translateY(-3px);
-  }
+/* 图标显示/隐藏 */
+.copy-button .hidden {
+  display: none;
 }
 
+/* 图标抖动动画 */
 @keyframes icon-shake {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  10%, 30%, 50%, 70%, 90% {
-    transform: translateX(-2px);
-  }
-  20%, 40%, 60%, 80% {
-    transform: translateX(2px);
-  }
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px) rotate(-5deg); }
+  75% { transform: translateX(3px) rotate(5deg); }
+}
+
+/* ============================================
+   代码块内容
+   ============================================ */
+.code-content-wrapper {
+  @apply relative;
+  background: #0d1117;
 }
 
 .code-block {
-  @apply !m-0 !p-0 overflow-x-hidden;
-  background: #0d1117;
+  @apply !m-0 !p-0;
+  background: transparent;
   position: relative;
   max-width: 100%;
-  box-sizing: border-box;
-}
-
-.code-block::before {
-  content: none;
 }
 
 .code-block code {
-  @apply block px-4 py-4 text-sm leading-relaxed text-gray-200;
+  @apply block px-6 py-5 text-sm leading-7;
   counter-reset: line;
-  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Cascadia Code', 'Inconsolata', 'Roboto Mono', 'Consolas', 'Ubuntu Mono', monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', 'Monaco', 'Consolas', 'Ubuntu Mono', monospace;
+  font-weight: 450;
+  font-feature-settings: 'liga' 1, 'calt' 1;
   background: transparent;
-  min-height: 100px;
+  color: #e6edf3;
+  min-height: 120px;
   position: relative;
-  z-index: 1;
-  text-shadow: none;
+  white-space: pre;
+  overflow-x: auto;
   max-width: 100%;
-  box-sizing: border-box;
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-wrap: anywhere;
 }
 
+/* ============================================
+   代码行样式 - 增强的交互效果
+   ============================================ */
 .code-line {
-  @apply block hover:bg-blue-500/10 pl-2 pr-4 py-0.5 rounded transition-all duration-200;
+  @apply block transition-all duration-200;
   min-height: 1.75rem;
-  display: block;
+  padding: 2px 16px 2px 0;
   position: relative;
-  width: 100%;
-  white-space: pre-wrap;
+  border-left: 2px solid transparent;
+  margin-left: -4px;
+  padding-left: 4px;
 }
 
-.code-line:hover::before {
-  background: rgba(59, 130, 246, 0.08);
-  border-radius: 2px;
+.code-line:hover {
+  background: linear-gradient(90deg, rgba(59, 130, 246, 0.08) 0%, transparent 100%);
+  border-left-color: rgba(59, 130, 246, 0.5);
 }
 
+/* 行号样式 - 更加精致 */
 .code-line::before {
   counter-increment: line;
   content: counter(line);
-  @apply inline-block w-8 mr-3 text-right select-none font-mono text-xs flex-shrink-0;
-  color: #64748b;
-  padding-right: 0.5rem;
-  line-height: 1.75rem;
-  transition: none;
-  text-shadow: none;
+  @apply inline-block text-right select-none font-mono text-xs;
+  width: 40px;
+  margin-right: 24px;
+  color: #484f58;
+  user-select: none;
+  transition: all 0.2s ease;
 }
 
-/* 每隔5行高亮一次 */
-.code-line:nth-child(5n)::before {
-  color: #94a3b8;
+.code-line:hover::before {
+  color: #768390;
   font-weight: 600;
 }
 
-/* Highlight.js深色主题样式 - 优化对比度 */
-.hljs {
-  @apply bg-transparent;
-  color: #cbd5e1;
+/* 每5行加粗行号 */
+.code-line:nth-child(5n)::before {
+  color: #58606a;
+  font-weight: 600;
 }
 
+/* ============================================
+   语法高亮 - GitHub Dark主题增强版
+   ============================================ */
+.hljs {
+  background: transparent;
+  color: #e6edf3;
+}
+
+/* 注释 - 斜体 & 柔和 */
 .hljs-comment,
 .hljs-quote {
-  color: #94a3b8;
+  color: #8b949e;
   font-style: italic;
 }
 
+/* 关键字 - 紫色渐变 */
 .hljs-keyword,
 .hljs-selector-tag,
 .hljs-addition {
-  color: #a78bfa;
+  color: #ff7b72;
   font-weight: 600;
+  text-shadow: 0 0 10px rgba(255, 123, 114, 0.3);
 }
 
-.hljs-number,
+/* 字符串 - 绿色 */
 .hljs-string,
 .hljs-meta .hljs-string,
 .hljs-literal,
 .hljs-doctag,
 .hljs-regexp {
-  color: #86efac;
+  color: #a5d6ff;
 }
 
+/* 数字 - 青色 */
+.hljs-number {
+  color: #79c0ff;
+  font-weight: 600;
+}
+
+/* 函数名 - 蓝色 */
 .hljs-title,
 .hljs-section,
 .hljs-name,
 .hljs-selector-id,
 .hljs-selector-class {
-  color: #93c5fd;
+  color: #d2a8ff;
   font-weight: 600;
 }
 
+.hljs-function .hljs-title {
+  color: #d2a8ff;
+  font-weight: 700;
+}
+
+/* 变量 - 金黄色 */
 .hljs-attribute,
 .hljs-attr,
 .hljs-variable,
 .hljs-template-variable,
-.hljs-class .hljs-title,
 .hljs-type {
-  color: #fde68a;
+  color: #ffa657;
 }
 
+/* 类名 */
+.hljs-class .hljs-title {
+  color: #f0883e;
+  font-weight: 600;
+}
+
+/* 符号 */
 .hljs-symbol,
 .hljs-bullet,
 .hljs-subst,
 .hljs-meta,
-.hljs-meta .hljs-keyword,
-.hljs-selector-attr,
-.hljs-selector-pseudo,
 .hljs-link {
-  color: #67e8f9;
+  color: #79c0ff;
 }
 
+/* 内置函数 */
 .hljs-built_in,
 .hljs-deletion {
-  color: #f87171;
+  color: #ffa198;
 }
 
-.hljs-formula {
-  background: rgba(55, 65, 81, 0.5);
-  padding: 2px 4px;
-  border-radius: 4px;
+/* 运算符 */
+.hljs-operator {
+  color: #ff7b72;
 }
 
+/* 标点符号 */
+.hljs-punctuation {
+  color: #c9d1d9;
+}
+
+/* 标签 */
+.hljs-tag {
+  color: #7ee787;
+}
+
+.hljs-tag .hljs-name {
+  color: #7ee787;
+  font-weight: 600;
+}
+
+.hljs-tag .hljs-attr {
+  color: #79c0ff;
+}
+
+/* 强调 */
 .hljs-emphasis {
   font-style: italic;
 }
 
 .hljs-strong {
-  font-weight: bold;
-  color: #f3f4f6;
+  font-weight: 700;
+  color: #f0f6fc;
 }
 
-/* 函数名特殊样式 */
-.hljs-function .hljs-title {
-  color: #93c5fd;
-  font-weight: 600;
+/* ============================================
+   Mermaid 图表样式
+   ============================================ */
+.mermaid-container {
+  @apply my-8 text-center;
 }
 
-/* 操作符样式 */
-.hljs-operator {
-  color: #f472b6;
+.mermaid {
+  @apply inline-block rounded-2xl shadow-xl p-8 border;
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  border-color: rgba(226, 232, 240, 0.8);
+  min-width: 320px;
+  transition: all 0.3s ease;
 }
 
-/* 标点符号 */
-.hljs-punctuation {
-  color: #d1d5db;
+.mermaid:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
 }
 
-/* 关键字高亮 */
-.hljs-tag {
-  color: #c084fc;
+/* ============================================
+   ECharts 图表样式
+   ============================================ */
+.echarts-container {
+  @apply my-8;
 }
 
-.hljs-tag .hljs-name {
-  color: #60a5fa;
+.echarts-chart {
+  @apply rounded-2xl shadow-xl border p-6;
+  background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  border-color: rgba(226, 232, 240, 0.8);
+  transition: all 0.3s ease;
 }
 
-.hljs-tag .hljs-attr {
-  color: #fbbf24;
+.echarts-chart:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
 }
 
-/* 响应式调整 */
+.echarts-container .error {
+  @apply bg-red-50 border-2 border-red-200 text-red-700 px-6 py-4 rounded-xl text-center shadow-md;
+}
+
+/* ============================================
+   滚动条美化
+   ============================================ */
+.code-block code::-webkit-scrollbar {
+  height: 12px;
+}
+
+.code-block code::-webkit-scrollbar-track {
+  background: rgba(22, 27, 34, 0.8);
+  border-radius: 6px;
+  margin: 4px 0;
+}
+
+.code-block code::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #30363d 0%, #484f58 100%);
+  border-radius: 6px;
+  border: 2px solid rgba(22, 27, 34, 0.8);
+}
+
+.code-block code::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #484f58 0%, #6e7681 100%);
+}
+
+/* ============================================
+   动画效果
+   ============================================ */
+@keyframes success-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes error-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
+@keyframes icon-bounce {
+  0%, 20%, 60%, 100% { transform: translateY(0) scale(1); }
+  40% { transform: translateY(-8px) scale(1.1); }
+  80% { transform: translateY(-4px) scale(1.05); }
+}
+
+/* ============================================
+   响应式设计
+   ============================================ */
 @media (max-width: 768px) {
   .code-header {
-    @apply px-3 py-2;
-    min-height: 46px;
+    @apply px-4 py-2.5;
   }
-  
-  .code-line::before {
-    @apply w-8 mr-3 text-xs;
-    padding-right: 0.5rem;
+
+  .code-header::before {
+    left: 12px;
+    transform: translateY(-50%) scale(0.85);
   }
-  
+
+  .code-language {
+    @apply text-xs ml-14;
+  }
+
   .code-block code {
-    @apply text-xs px-3 py-3;
+    @apply px-4 py-4 text-xs leading-6;
   }
-  
+
+  .code-line::before {
+    width: 32px;
+    margin-right: 16px;
+  }
+
   .copy-button {
-    @apply top-2 right-2 p-2;
+    @apply p-2;
   }
-  
+
   .copy-button svg {
     width: 16px;
     height: 16px;
   }
-  
+
+  .mermaid {
+    @apply p-6;
+    min-width: 280px;
+  }
+
   .echarts-chart {
     height: 300px !important;
   }
-  
-  .mermaid {
-    @apply p-4;
-    min-width: 250px;
-  }
 }
 
-/* 深色模式支持 */
+/* ============================================
+   深色模式支持
+   ============================================ */
 @media (prefers-color-scheme: dark) {
   .mermaid {
-    @apply bg-gray-800 border-gray-700;
+    background: linear-gradient(145deg, #1a202c 0%, #0f1419 100%);
+    border-color: rgba(255, 255, 255, 0.05);
   }
-  
+
   .echarts-chart {
-    @apply bg-gray-800 border-gray-700;
+    background: linear-gradient(145deg, #1a202c 0%, #0f1419 100%);
+    border-color: rgba(255, 255, 255, 0.05);
   }
-  
+
   .echarts-container .error {
-    @apply bg-red-900/30 border-red-700 text-red-300;
+    @apply bg-red-900/20 border-red-700 text-red-300;
   }
 }
 
-/* 滚动条样式 */
-.code-block::-webkit-scrollbar {
-  height: 10px;
-}
-
-.code-block::-webkit-scrollbar-track {
-  background: #1f2937;
-  border-radius: 6px;
-}
-
-.code-block::-webkit-scrollbar-thumb {
-  background: #4b5563;
-  border-radius: 6px;
-  border: 2px solid #1f2937;
-}
-
-.code-block::-webkit-scrollbar-thumb:hover {
-  background: #6b7280;
-}
-
-/* 代码块动画效果 */
+/* ============================================
+   页面加载淡入动画
+   ============================================ */
 .code-block-container {
-  transition: all 0.3s ease-in-out;
+  animation: fadeInUp 0.6s ease-out;
 }
 
-.code-block-container:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 25px -5px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
-}
-
-/* Mermaid和ECharts容器动画 */
-.mermaid-container:hover .mermaid,
-.echarts-container:hover .echarts-chart {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s ease-in-out;
-}
-
-/* 代码高亮特效 */
-.code-line:hover::before {
-  color: #9ca3af;
-  font-weight: 600;
-}
-
-/* 复制成功动画 */
-@keyframes copy-success {
-  0% {
-    transform: scale(1) rotate(0deg);
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  25% {
-    transform: scale(1.15) rotate(-5deg);
-  }
-  50% {
-    transform: scale(1.2) rotate(3deg);
-  }
-  75% {
-    transform: scale(1.1) rotate(-1deg);
-  }
-  100% {
-    transform: scale(1) rotate(0deg);
-  }
-}
-
-/* 复制错误动画 */
-@keyframes copy-error {
-  0%, 100% {
-    transform: translateX(0);
-  }
-  20%, 60% {
-    transform: translateX(-4px);
-  }
-  40%, 80% {
-    transform: translateX(4px);
-  }
-}
-
-/* 脉冲光晕动画 */
-@keyframes pulse-glow {
-  0%, 100% {
+  to {
     opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.7;
-    transform: scale(1.2);
+    transform: translateY(0);
   }
 }
 
-/* 代码块容器动画 */
-.code-block-container {
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.code-block-container:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 12px 25px -8px rgba(0, 0, 0, 0.2);
-}
-
-/* 代码块加载动画 */
+/* 顶部光晕效果 */
 .code-block-container::after {
   content: '';
   position: absolute;
   top: 0;
-  left: -100%;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #60a5fa, transparent);
-  animation: loading-sweep 2s ease-in-out infinite;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: radial-gradient(ellipse at top, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-@keyframes loading-sweep {
-  0% {
-    left: -100%;
-  }
-  50% {
-    left: 100%;
-  }
-  100% {
-    left: 100%;
-    opacity: 0;
-  }
+.code-block-container:hover::after {
+  opacity: 1;
 }
