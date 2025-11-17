@@ -1,4 +1,7 @@
 ---
+// 禁用预渲染，确保登录页面可以处理POST请求
+export const prerender = false
+
 // 检查是否已经登录
 const cookies = Astro.cookies
 const isAuthenticated = cookies.get('admin_auth')?.value === 'authenticated'
