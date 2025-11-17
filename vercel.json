@@ -3,7 +3,6 @@
   "outputDirectory": "dist",
   "framework": "astro",
   "regions": ["sin1", "hkg1"],
-  "functionDirectory": "dist/functions",
   "functions": {
     "src/pages/api/**/*.ts": {
       "runtime": "nodejs20.x",
