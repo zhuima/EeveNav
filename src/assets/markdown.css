@@ -38,7 +38,10 @@
    代码头部 - macOS窗口控制按钮
    ============================================ */
 .code-header {
-  @apply flex items-center justify-between px-5 py-3;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  @apply px-5 py-3;
   background: rgba(255, 255, 255, 0.02);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
@@ -70,7 +73,8 @@
 }
 
 .code-language {
-  @apply text-sm font-bold tracking-wide ml-16;
+  @apply text-sm font-bold tracking-wide;
+  margin-left: 64px !important;
   background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -79,6 +83,7 @@
   align-items: center;
   gap: 10px;
   position: relative;
+  flex-shrink: 0;
 }
 
 /* 语言标签图标 */
@@ -99,9 +104,12 @@
    复制按钮 - 现代玻璃态设计（位于header右侧）
    ============================================ */
 .code-actions {
-  @apply flex items-center gap-2;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
   position: relative;
   z-index: 10;
+  margin-left: auto !important;
 }
 
 .copy-button {
