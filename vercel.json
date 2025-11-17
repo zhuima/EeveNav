@@ -1,6 +1,6 @@
 {
-  "buildCommand": "node scripts/build-and-cache.js",
-  "outputDirectory": "dist",
+  "buildCommand": "npx astro build",
+  "outputDirectory": ".vercel/output",
   "framework": "astro",
   "regions": ["sin1", "hkg1"],
   "functions": {
