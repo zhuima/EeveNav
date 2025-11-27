@@ -92,11 +92,56 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
             <!-- 封面图 -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">封面图片</label>
-              <input type="url" 
-                     id="cover" 
-                     name="cover"
-                     class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                     placeholder="图片URL地址">
+              <div class="space-y-3">
+                <!-- 隐藏的文件输入框 -->
+                <input type="file" 
+                       id="cover-upload" 
+                       accept="image/*" 
+                       class="hidden">
+                
+                <!-- 拖拽上传区域 -->
+                <div id="drop-zone" 
+                     class="relative border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-blue-500 transition-colors cursor-pointer group bg-gray-50 hover:bg-blue-50">
+                  <div class="flex flex-col items-center justify-center text-center">
+                    <div class="mb-3 p-3 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
+                      <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <p class="text-sm font-medium text-gray-900">点击或拖拽上传图片</p>
+                    <p class="text-xs text-gray-500 mt-1">支持 JPG, PNG, GIF, WebP</p>
+                    <p class="text-xs text-gray-400 mt-2">或者直接粘贴图片 (Ctrl+V)</p>
+                  </div>
+                </div>
+
+                <!-- URL 输入框 (作为备选) -->
+                <div class="relative">
+                  <input type="url" 
+                         id="cover" 
+                         name="cover"
+                         class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-sm"
+                         placeholder="或者输入图片 URL 地址">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                  </div>
+                </div>
+
+                <!-- 预览区域 -->
+                <div id="cover-preview-container" class="hidden relative group rounded-lg overflow-hidden border border-gray-200 bg-gray-100 aspect-video">
+                  <img id="cover-preview" src="" alt="封面预览" class="w-full h-full object-cover">
+                  <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center">
+                    <button type="button" 
+                            id="remove-cover"
+                            class="opacity-0 group-hover:opacity-100 p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all transform scale-90 group-hover:scale-100">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- 外部链接 -->
@@ -130,7 +175,15 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
           
           <div class="flex" style="height: 600px;">
             <!-- 编辑器 -->
-            <div id="editor-pane" class="flex-1 flex flex-col min-w-0">
+            <div id="editor-pane" class="flex-1 flex flex-col min-w-0 relative">
+              <!-- 拖拽遮罩层 -->
+              <div id="editor-drop-mask" class="absolute inset-0 bg-blue-50 bg-opacity-90 z-10 hidden flex-col items-center justify-center border-2 border-dashed border-blue-500 m-2 rounded-lg">
+                <svg class="w-12 h-12 text-blue-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <p class="text-lg font-medium text-blue-700">释放图片以上传</p>
+              </div>
+              
               <div class="flex-1 relative">
                 <textarea id="content" 
                           name="content" 
@@ -138,6 +191,7 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
                           placeholder="# 开始写作...
 
 在这里使用 Markdown 语法编写你的文章内容。
+支持直接粘贴或拖拽图片上传。
 
 ## 支持的语法
 
@@ -178,60 +232,307 @@ console.log('代码块');
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <script>
-  // Markdown 预览功能
-  const contentTextarea = document.getElementById('content') as HTMLTextAreaElement;
-  const previewContent = document.getElementById('preview-content');
-  const previewToggle = document.getElementById('preview-toggle');
-  const previewText = document.getElementById('preview-text');
-  const editorPane = document.getElementById('editor-pane');
-  const previewPane = document.getElementById('preview-pane');
-  
-  let isPreviewVisible = false;
+  // 确保 DOM 加载完成后再执行
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('Script initialized');
 
-  // 切换预览显示
-  previewToggle?.addEventListener('click', () => {
-    isPreviewVisible = !isPreviewVisible;
-    
-    if (isPreviewVisible) {
-      previewPane?.classList.remove('hidden');
-      if (previewText) previewText.textContent = '隐藏预览';
-      updatePreview();
-    } else {
-      previewPane?.classList.add('hidden');
-      if (previewText) previewText.textContent = '显示预览';
-    }
-  });
+    // 通用上传函数
+    async function uploadImage(file: File): Promise<string | null> {
+      console.log('Uploading file:', file, 'Type:', file.type, 'Name:', file.name);
+      const formData = new FormData();
+      formData.append('file', file);
 
-  // 实时更新预览
-  function updatePreview() {
-    if (isPreviewVisible && previewContent) {
-      const markdownText = contentTextarea.value;
-      if (markdownText.trim()) {
-        previewContent.innerHTML = (window as any).marked.parse(markdownText);
-      } else {
-        previewContent.innerHTML = '<p class="text-gray-500 italic">预览内容将在这里显示...</p>';
+      try {
+        showNotification('正在上传图片...', 'info');
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+          showNotification('图片上传成功', 'success');
+          return result.url;
+        } else {
+          showNotification(result.message || '上传失败', 'error');
+          return null;
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        showNotification('上传出错', 'error');
+        return null;
       }
     }
-  }
 
-  // 监听内容变化
-  contentTextarea.addEventListener('input', updatePreview);
+    // 获取 DOM 元素
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('cover-upload') as HTMLInputElement;
+    const coverInput = document.getElementById('cover') as HTMLInputElement;
+    const coverPreviewContainer = document.getElementById('cover-preview-container');
+    const coverPreview = document.getElementById('cover-preview') as HTMLImageElement;
+    const removeCoverBtn = document.getElementById('remove-cover');
+    
+    const contentTextarea = document.getElementById('content') as HTMLTextAreaElement;
+    const previewContent = document.getElementById('preview-content');
+    const previewToggle = document.getElementById('preview-toggle');
+    const previewText = document.getElementById('preview-text');
+    const editorPane = document.getElementById('editor-pane');
+    const previewPane = document.getElementById('preview-pane');
+    const editorDropMask = document.getElementById('editor-drop-mask');
+    const titleInput = document.getElementById('title') as HTMLInputElement;
+    const slugInput = document.getElementById('slug') as HTMLInputElement;
 
-  // 自动生成别名
-  const titleInput = document.getElementById('title') as HTMLInputElement;
-  const slugInput = document.getElementById('slug') as HTMLInputElement;
-  
-  titleInput.addEventListener('input', () => {
-    if (!slugInput.value) {
-      // 简单的别名生成：移除特殊字符，用连字符连接
-      const slug = titleInput.value
-        .toLowerCase()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-+|-+$/g, ''); // 移除开头和结尾的连字符
-      slugInput.value = slug;
+    // 检查关键元素是否存在
+    if (!dropZone || !fileInput || !coverInput || !contentTextarea) {
+      console.error('Critical elements missing');
+      return;
     }
+
+    // 封面图处理逻辑
+    // 更新预览
+    function updateCoverPreview(url: string) {
+      if (url && coverPreview && coverPreviewContainer && dropZone) {
+        coverPreview.src = url;
+        coverPreviewContainer.classList.remove('hidden');
+        dropZone.classList.add('hidden');
+      } else if (coverPreview && coverPreviewContainer && dropZone) {
+        coverPreview.src = '';
+        coverPreviewContainer.classList.add('hidden');
+        dropZone.classList.remove('hidden');
+      }
+    }
+
+    // 监听 URL 输入变化
+    coverInput.addEventListener('input', (e) => {
+      const url = (e.target as HTMLInputElement).value;
+      updateCoverPreview(url);
+    });
+
+    // 点击上传
+    dropZone.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const url = await uploadImage(file);
+        if (url) {
+          coverInput.value = url;
+          updateCoverPreview(url);
+        }
+      }
+      fileInput.value = ''; // 重置 input
+    });
+
+    // 拖拽上传 - 封面
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('border-blue-500', 'bg-blue-50');
+    });
+
+    dropZone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+    });
+
+    dropZone.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+      
+      const file = e.dataTransfer?.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const url = await uploadImage(file);
+        if (url) {
+          coverInput.value = url;
+          updateCoverPreview(url);
+        }
+      }
+    });
+
+    // 粘贴上传 - 封面
+    document.addEventListener('paste', async (e) => {
+      // 如果焦点在 URL 输入框，不处理
+      if (document.activeElement === coverInput) return;
+      // 如果焦点在编辑器，由编辑器逻辑处理
+      if (document.activeElement === contentTextarea) return;
+
+      // 检查是否有图片粘贴
+      const items = e.clipboardData?.items;
+      if (items) {
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type.indexOf('image') !== -1) {
+            const file = items[i].getAsFile();
+            if (file) {
+              const url = await uploadImage(file);
+              if (url) {
+                coverInput.value = url;
+                updateCoverPreview(url);
+              }
+            }
+            break; // 只处理第一张图片
+          }
+        }
+      }
+    });
+
+    // 移除封面
+    removeCoverBtn?.addEventListener('click', (e) => {
+      e.stopPropagation(); // 防止触发 dropZone 点击
+      coverInput.value = '';
+      updateCoverPreview('');
+    });
+
+    // Markdown 预览功能
+    let isPreviewVisible = false;
+
+    // 编辑器拖拽上传
+    editorPane?.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      editorDropMask?.classList.remove('hidden');
+      editorDropMask?.classList.add('flex');
+    });
+
+    editorDropMask?.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      editorDropMask?.classList.add('hidden');
+      editorDropMask?.classList.remove('flex');
+    });
+
+    editorDropMask?.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      editorDropMask?.classList.add('hidden');
+      editorDropMask?.classList.remove('flex');
+
+      const file = e.dataTransfer?.files[0];
+      if (file && file.type.startsWith('image/')) {
+        await handleEditorUpload(file);
+      }
+    });
+
+    // 编辑器粘贴上传
+    contentTextarea.addEventListener('paste', async (e) => {
+      const items = e.clipboardData?.items;
+      if (items) {
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type.indexOf('image') !== -1) {
+            e.preventDefault(); // 阻止默认粘贴
+            const file = items[i].getAsFile();
+            if (file) {
+              await handleEditorUpload(file);
+            }
+            break;
+          }
+        }
+      }
+    });
+
+    // 处理编辑器图片上传并插入 Markdown
+    async function handleEditorUpload(file: File) {
+      const startPos = contentTextarea.selectionStart;
+      const endPos = contentTextarea.selectionEnd;
+      
+      // 插入占位符
+      const placeholder = `![正在上传 ${file.name}...]()`;
+      insertAtCursor(contentTextarea, placeholder);
+      
+      const url = await uploadImage(file);
+      
+      // 替换占位符
+      const currentContent = contentTextarea.value;
+      if (url) {
+        const markdownImage = `![image](${url})`;
+        contentTextarea.value = currentContent.replace(placeholder, markdownImage);
+      } else {
+        // 上传失败，移除占位符
+        contentTextarea.value = currentContent.replace(placeholder, '');
+      }
+      
+      // 触发 input 事件以更新预览
+      contentTextarea.dispatchEvent(new Event('input'));
+    }
+
+    // 在光标处插入文本
+    function insertAtCursor(textarea: HTMLTextAreaElement, text: string) {
+      const startPos = textarea.selectionStart;
+      const endPos = textarea.selectionEnd;
+      const scrollTop = textarea.scrollTop;
+      
+      textarea.value = textarea.value.substring(0, startPos)
+        + text
+        + textarea.value.substring(endPos, textarea.value.length);
+        
+      textarea.focus();
+      textarea.selectionStart = startPos + text.length;
+      textarea.selectionEnd = startPos + text.length;
+      textarea.scrollTop = scrollTop;
+    }
+
+    // 切换预览显示
+    previewToggle?.addEventListener('click', () => {
+      isPreviewVisible = !isPreviewVisible;
+      
+      if (isPreviewVisible) {
+        previewPane?.classList.remove('hidden');
+        if (previewText) previewText.textContent = '隐藏预览';
+        updatePreview();
+      } else {
+        previewPane?.classList.add('hidden');
+        if (previewText) previewText.textContent = '显示预览';
+      }
+    });
+
+    // 实时更新预览
+    function updatePreview() {
+      if (isPreviewVisible && previewContent) {
+        const markdownText = contentTextarea.value;
+        if (markdownText.trim()) {
+          // 检查 marked 是否加载
+          if ((window as any).marked) {
+            previewContent.innerHTML = (window as any).marked.parse(markdownText);
+          } else {
+            console.warn('marked.js not loaded yet');
+            previewContent.innerHTML = '<p class="text-gray-500 italic">预览组件加载中...</p>';
+          }
+        } else {
+          previewContent.innerHTML = '<p class="text-gray-500 italic">预览内容将在这里显示...</p>';
+        }
+      }
+    }
+
+    // 监听内容变化
+    contentTextarea.addEventListener('input', updatePreview);
+
+    // 自动生成别名
+    titleInput?.addEventListener('input', () => {
+      if (slugInput && !slugInput.value) {
+        // 简单的别名生成：移除特殊字符，用连字符连接
+        const slug = titleInput.value
+          .toLowerCase()
+          .replace(/[^\w\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-+|-+$/g, ''); // 移除开头和结尾的连字符
+        slugInput.value = slug;
+      }
+    });
+
+    // 加载分类数据
+    loadCategories();
+    
+    // 绑定保存按钮事件
+    const saveDraftBtn = document.getElementById('save-draft-btn');
+    const publishBtn = document.getElementById('publish-btn');
+    
+    saveDraftBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      savePost(true);
+    });
+
+    publishBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      savePost(false);
+    });
   });
 
   // 加载分类数据
@@ -241,7 +542,7 @@ console.log('代码块');
       const data = await response.json();
       const categorySelect = document.getElementById('category');
       
-      if (data.success && data.categories) {
+      if (data.success && data.categories && categorySelect) {
         data.categories.forEach((category: any) => {
           const option = document.createElement('option');
           option.value = category.name;
@@ -257,6 +558,8 @@ console.log('代码块');
   // 保存文章
   async function savePost(isDraft = false) {
     const form = document.getElementById('post-form') as HTMLFormElement;
+    if (!form) return;
+    
     const formData = new FormData(form);
     const tagsValue = formData.get('tags') as string || '';
     
@@ -321,22 +624,6 @@ console.log('代码块');
       notification.remove();
     }, 3000);
   }
-
-  // 绑定保存按钮事件
-  document.getElementById('save-draft-btn').addEventListener('click', (e) => {
-    e.preventDefault();
-    savePost(true);
-  });
-
-  document.getElementById('publish-btn').addEventListener('click', (e) => {
-    e.preventDefault();
-    savePost(false);
-  });
-
-  // 初始化
-  document.addEventListener('DOMContentLoaded', () => {
-    loadCategories();
-  });
 
   // 键盘快捷键
   document.addEventListener('keydown', (e) => {
