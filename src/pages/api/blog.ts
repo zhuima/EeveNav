@@ -74,8 +74,8 @@ export const GET: APIRoute = async ({ url, request }) => {
           tags: '获取所有标签',
           post: '获取单篇文章（需要slug参数）'
         },
-        searchUsage: 'http://localhost:4321/api/blog?search=关键词',
-        usage: 'http://localhost:4321/api/blog?action=posts'
+        searchUsage: `${import.meta.env.SITE}/api/blog?search=关键词`,
+        usage: `${import.meta.env.SITE}/api/blog?action=posts`
       }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },

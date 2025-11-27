@@ -4,6 +4,7 @@ import vercel from '@astrojs/vercel/serverless'
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://www.affdirs.com',
   output: 'hybrid', // 混合模式：静态页面 + 服务端页面
   adapter: vercel(), // 使用Vercel适配器支持混合模式
   integrations: [
