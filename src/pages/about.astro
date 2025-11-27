@@ -2,186 +2,91 @@
 import Layout from '../layouts/Layout.astro'
 ---
 
-<Layout title="关于我们 - AffDirs">
-  <main class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-    <div class="container mx-auto px-4 py-12">
-      <div class="max-w-4xl mx-auto">
+<Layout title="关于我们 - AffDirs | 值得信赖的开发者导航">
+  <main class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50" itemscope itemtype="https://schema.org/AboutPage">
+    <div class="container mx-auto px-4 py-16">
+      <div class="max-w-4xl mx-auto space-y-20">
         
-        <!-- Hero Section -->
-        <div class="text-center mb-12">
-          <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6">
-            关于 AffDirs
+        <div class="text-center space-y-6">
+          <h1 class="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight" itemprop="headline">
+            让每一次搜索都<span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">值得信赖</span>
           </h1>
-          <p class="text-xl text-gray-600 leading-relaxed">
-            一个集成导航站和博客的资源分享平台
+          <p class="text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            AffDirs 致力于在信息过载的时代，为独立开发者和创作者提供一道“过滤器”。
+            <br class="hidden md:block" />
+            只收录真正提升效率的优质工具，拒绝无效信息。
           </p>
         </div>
 
-        <!-- 功能介绍 -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-          <div class="bg-white rounded-xl shadow-lg p-8">
-            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
-              </svg>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-3">资源导航</h3>
-            <p class="text-gray-600 leading-relaxed">
-              精心整理的优质工具、网站、教程和资源合集，帮助您快速找到需要的内容，提升工作和学习效率。
-            </p>
-          </div>
-
-          <div class="bg-white rounded-xl shadow-lg p-8">
-            <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-              </svg>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-3">博客文章</h3>
-            <p class="text-gray-600 leading-relaxed">
-              分享技术心得、使用教程、行业观察和个人思考，记录学习成长的点点滴滴。
-            </p>
-          </div>
-
-          <div class="bg-white rounded-xl shadow-lg p-8">
-            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-3">智能搜索</h3>
-            <p class="text-gray-600 leading-relaxed">
-              支持标题、描述、标签等多维度搜索，配合分类过滤功能，让您快速定位目标内容。
-            </p>
-          </div>
-
-          <div class="bg-white rounded-xl shadow-lg p-8">
-            <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-              <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"></path>
-              </svg>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-3">标签分类</h3>
-            <p class="text-gray-600 leading-relaxed">
-              完善的分类和标签体系，让内容组织更有序，用户可以按照兴趣和需求精准筛选。
-            </p>
-          </div>
-        </div>
-
-        <!-- 技术栈 -->
-        <div class="bg-white rounded-xl shadow-lg p-8 mb-12">
-          <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">技术实现</h2>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div class="text-center">
-              <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                <span class="text-2xl font-bold text-blue-600">A</span>
+        <div class="bg-white rounded-2xl p-8 md:p-10 shadow-xl shadow-blue-900/5 border border-slate-100 relative overflow-hidden" itemprop="mainEntity" itemscope itemtype="https://schema.org/Person">
+          <div class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-gradient-to-br from-blue-100 to-transparent rounded-full opacity-50 blur-2xl"></div>
+          
+          <div class="flex flex-col md:flex-row items-center gap-8 md:gap-10 relative z-10">
+            <div class="shrink-0 relative">
+              <div class="w-32 h-32 rounded-full p-1 bg-gradient-to-br from-blue-500 to-purple-500">
+                <div class="w-full h-full rounded-full bg-white p-1 overflow-hidden">
+                  <img src="https://pub-89da898cfdba40ebb5e6144637a364cd.r2.dev/unnamed.jpg" alt="zhuima" class="w-full h-full object-cover rounded-full" itemprop="image" />
+                </div>
               </div>
-              <div class="font-semibold text-gray-900">Astro</div>
-              <div class="text-sm text-gray-500">静态站点生成</div>
-            </div>
-            
-            <div class="text-center">
-              <div class="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                <span class="text-2xl font-bold text-blue-600">TS</span>
+              <div class="absolute bottom-1 right-1 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full border-2 border-white shadow-sm">
+                Owner
               </div>
-              <div class="font-semibold text-gray-900">TypeScript</div>
-              <div class="text-sm text-gray-500">类型安全</div>
             </div>
-            
-            <div class="text-center">
-              <div class="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                <span class="text-2xl font-bold text-green-600">DB</span>
-              </div>
-              <div class="font-semibold text-gray-900">SQLite</div>
-              <div class="text-sm text-gray-500">轻量数据库</div>
-            </div>
-            
-            <div class="text-center">
-              <div class="w-16 h-16 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                <span class="text-2xl font-bold text-purple-600">UI</span>
-              </div>
-              <div class="font-semibold text-gray-900">UnoCSS</div>
-              <div class="text-sm text-gray-500">原子化CSS</div>
-            </div>
-          </div>
-        </div>
 
-        <!-- 特色功能 -->
-        <div class="bg-white rounded-xl shadow-lg p-8 mb-12">
-          <h2 class="text-2xl font-bold text-gray-900 mb-6">主要特色</h2>
-          <div class="space-y-4">
-            <div class="flex items-start space-x-3">
-              <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
-                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
+            <div class="text-center md:text-left flex-1 space-y-4">
               <div>
-                <h3 class="font-semibold text-gray-900">双模式设计</h3>
-                <p class="text-gray-600">同时支持资源导航和博客功能，一个平台满足多种需求</p>
+                <h2 class="text-2xl font-bold text-slate-900 flex items-center justify-center md:justify-start gap-2">
+                  Hi, 我是 <span itemprop="name" class="text-blue-600">zhuima</span>
+                </h2>
+                <p class="text-slate-500 font-medium mt-1" itemprop="jobTitle">独立开发者 / 全栈工程师</p>
               </div>
-            </div>
-            
-            <div class="flex items-start space-x-3">
-              <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
-                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
-              <div>
-                <h3 class="font-semibold text-gray-900">响应式设计</h3>
-                <p class="text-gray-600">完美适配桌面端、平板和移动设备，随时随地访问</p>
-              </div>
-            </div>
-            
-            <div class="flex items-start space-x-3">
-              <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
-                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
-              <div>
-                <h3 class="font-semibold text-gray-900">数据验证</h3>
-                <p class="text-gray-600">严格的数据验证机制，确保内容质量和系统稳定性</p>
-              </div>
-            </div>
-            
-            <div class="flex items-start space-x-3">
-              <div class="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mt-0.5">
-                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
-              <div>
-                <h3 class="font-semibold text-gray-900">管理后台</h3>
-                <p class="text-gray-600">直观的管理界面，支持添加、编辑、删除等完整的内容管理功能</p>
+              
+              <p class="text-slate-600 leading-relaxed">
+                作为一名天天和代码打交道的开发者，我深知“找工具”的痛苦：搜索结果充斥着广告、SEO 垃圾站和过时的教程。
+              </p>
+              <p class="text-slate-600 leading-relaxed">
+                创建 <strong>AffDirs</strong> 的初衷很简单：我希望建立一个<span class="font-semibold text-slate-900">“经过人工验证的”</span>资源库。这里的每一个链接，都是我自己开发过程中觉得好用、并愿意推荐给朋友的宝藏。
+              </p>
+
+              <div class="pt-2 flex justify-center md:justify-start gap-4">
+                <a href="https://github.com/zhuima" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition shadow-lg shadow-slate-900/20">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clip-rule="evenodd"></path></svg>
+                  <span>GitHub</span>
+                </a>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 联系信息 -->
-        <div class="text-center bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-8">
-          <h2 class="text-2xl font-bold text-gray-900 mb-4">联系我们</h2>
-          <p class="text-gray-600 mb-6">
-            如果您有任何建议、问题或想要分享的资源，欢迎与我们联系！
-          </p>
-          <div class="flex justify-center space-x-6">
-            <a href="mailto:contact@AffDirs.com" class="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors">
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.94a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-              </svg>
-              邮箱联系
-            </a>
-            <a href="https://github.com/zhuima" class="inline-flex items-center text-gray-600 hover:text-gray-800 transition-colors">
-              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clip-rule="evenodd"></path>
-              </svg>
-              GitHub
-            </a>
+        <div>
+          <h3 class="text-2xl font-bold text-center text-slate-900 mb-10">我们的收录标准</h3>
+          <div class="grid md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition">
+              <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4 text-2xl">🔍</div>
+              <h4 class="font-bold text-slate-900 text-lg mb-2">人工亲测</h4>
+              <p class="text-slate-600 text-sm leading-relaxed">
+                拒绝爬虫抓取的垃圾数据。收录的每一个工具，我都进行过基础功能测试，确保真实可用。
+              </p>
+            </div>
+            <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition">
+              <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mb-4 text-2xl">🛡️</div>
+              <h4 class="font-bold text-slate-900 text-lg mb-2">拒绝流氓</h4>
+              <p class="text-slate-600 text-sm leading-relaxed">
+                对用户体验零容忍。弹窗过多、强制捆绑下载或存在安全风险的站点，主要功能再强也不予收录。
+              </p>
+            </div>
+            <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition">
+              <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 text-2xl">⚖️</div>
+              <h4 class="font-bold text-slate-900 text-lg mb-2">客观中立</h4>
+              <p class="text-slate-600 text-sm leading-relaxed">
+                如果文章包含推广链接，我会明确标注。但这绝不影响评价维度，"好用"是唯一的上榜理由。
+              </p>
+            </div>
           </div>
         </div>
+
+
       </div>
     </div>
   </main>
-</Layout> 
+</Layout>
